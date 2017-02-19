@@ -9,7 +9,12 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "vue": "^2.1.10"
+    "es6-promise": "^4.0.5",
+    "isomorphic-fetch": "^2.2.1",
+    "rxjs": "^5.1.1",
+    "vue": "^2.1.10",
+    "vue-infinite-loading": "^2.0.0",
+    "vue-rx": "^2.3.1"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.2",
