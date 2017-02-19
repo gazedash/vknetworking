@@ -1,5 +1,6 @@
 
 //const api_key = "API_KEY";
+// https://api.vk.com/method/users.search?group_id=97408246&fields=photo_max,first_name,last_name&online=0&city=139&sex=0&has_photo=1&access_token=API_KEY
 import fetch from 'isomorphic-fetch'
 const api_key = "API_KEY";
 const endpoint = "https://api.vk.com";
@@ -31,7 +32,7 @@ export function fetchCommunities(userId) {
     // .then(json => json.response.groups.items);
 }
 
-export function fetchMembers(id, city = "", sex = 0, age_from = 0, age_to = 0) {
+export function fetchMembers({id, city = "", sex = 0, age_from = 0, age_to = 0}) {
   return fetch(buildGetMembersUrl(id, city, sex, age_from, age_to))
     .then(response => {
       return response.json();
