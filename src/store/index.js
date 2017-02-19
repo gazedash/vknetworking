@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import {fetchCommunities, fetchMembers} from "../vk_api/index";
+import _ from 'lodash';
 
 Vue.use(Vuex);
 
@@ -23,7 +24,7 @@ const mutations = {
     state.communityIdList = state.communityIdList.concat(items)
   },
   getProfilesFromCommunity (state, {items}) {
-    state.profileList = state.profileList.concat(items)
+    state.profileList = _.uniqBy(state.profileList.concat(items), 'uid');
   },
   getNextNext (state, {items}) {
     mutations.getNext(state, {items});
@@ -45,10 +46,8 @@ const actions = {
       });
   },
   getProfilesFromCommunity ({ commit }, payload) {
-    console.log(payload);
     return fetchMembers(payload)
       .then(items => {
-        console.log({items, payload});
         commit('getProfilesFromCommunity', {items});
         return items;
       });
@@ -60,7 +59,7 @@ const actions = {
         return actions.getNext({ dispatch, commit, state }, { items, ...payload});
       });
   },
-  getNext ({ dispatch, commit, state, ...rest }, {items, ...payload}, rest2) {
+  getNext ({ dispatch, commit, state }, {items, ...payload}) {
     // payload is options for profile searching
     return dispatch('getProfilesFromCommunity', {
     id: items[state.index], ...payload
