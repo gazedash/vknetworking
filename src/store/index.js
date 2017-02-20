@@ -1,12 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import {fetchCommunities, fetchMembers} from "../vk_api/index";
-import _ from 'lodash';
+import uniqBy from 'lodash/uniqBy';
 
 Vue.use(Vuex);
 
 const state = {
   index: 0,
+  fetchedCommunitiesLength: 0,
   profileList: [],
   communityIdList: [],
 };
@@ -20,11 +21,14 @@ const mutations = {
   setIndex (state, index) {
     state.index = index
   },
+  fetchedCommunitiesLength (state) {
+    state.fetchedCommunitiesLength++;
+  },
   getCommunityIdList (state, {items}) {
     state.communityIdList = state.communityIdList.concat(items)
   },
   getProfilesFromCommunity (state, {items}) {
-    state.profileList = _.uniqBy(state.profileList.concat(items), 'uid');
+    state.profileList = uniqBy(state.profileList.concat(items), 'uid');
   },
   getNextNext (state, {items}) {
     mutations.getNext(state, {items});
@@ -48,6 +52,7 @@ const actions = {
   getProfilesFromCommunity ({ commit }, payload) {
     return fetchMembers(payload)
       .then(items => {
+        commit('fetchedCommunitiesLength');
         commit('getProfilesFromCommunity', {items});
         return items;
       });
