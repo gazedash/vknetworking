@@ -1,27 +1,30 @@
 <template>
-  <div class="search">
+  <!--<div class="search">-->
     <mu-paper class="paper" :zDepth="1" >
-      <div class="text-inputs">
-        <div class="profile-link">
-          <mu-text-field hintText="enter id or link" label="Profile" v-model.trim="profileLink"/>
-        </div>
-        <div class="city">
-          <mu-select-field v-model="city" :labelFocusClass="['label-foucs']" label="City">
-            <mu-menu-item v-for="text,index in options" ccc="dddd" ttt="ddd" :value="String(index)" :title="text.text" />
-          </mu-select-field>
-        </div>
+      <div class="profile-link">
+        <mu-text-field hintText="enter id or link" label="Profile" v-model.trim="profileLink"/>
       </div>
-      <div class="physical">
-        <div class="sex">
-          <mu-radio label="Male" name="group" nativeValue="Male" v-model="picked" class="demo-radio"/>
-          <mu-radio label="Female" name="group" nativeValue="Female" v-model="picked"  class="demo-radio"/>
-          <mu-radio label="All" name="group" nativeValue="All" v-model="picked"  class="demo-radio"/>
-        </div>
-        <div class="age">
-          <mu-text-field hintText="from" v-model.trim.number="age_from"/>
-          <mu-text-field hintText="to" v-model.trim.number="age_to"/>
-        </div>
+      <div class="country">
+        <mu-select-field v-model="country" :labelFocusClass="['label-foucs']" label="Country">
+          <mu-menu-item v-for="text,index in countries" ccc="dddd" ttt="ddd" :value="String(index)" :title="text.title" />
+        </mu-select-field>
       </div>
+      <div class="city">
+        <mu-select-field :city="city" :labelFocusClass="['label-foucs']" label="City">
+          <mu-menu-item v-for="text,index in cities" ccc="dddd" ttt="ddd" :value="String(index)" :title="text.title" />
+        </mu-select-field>
+      </div>
+      <div class="sex">
+        <mu-radio iconClass="sex-radio-icon" label="Male" name="group" nativeValue="2" v-model="picked" class="sex-radio"/>
+        <mu-radio iconClass="sex-radio-icon" label="Female" name="group" nativeValue="1" v-model="picked"  class="sex-radio"/>
+        <mu-radio iconClass="sex-radio-icon" label="All" name="group" nativeValue="0" v-model="picked"  class="sex-radio"/>
+      </div>
+      <div class="age">
+        <mu-text-field hintText="from" v-model.trim.number="age_from"/>
+        <mu-text-field hintText="to" v-model.trim.number="age_to"/>
+      </div>
+      <mu-flat-button @click="onSubmit" label="GO!" class="button" />
+      <mu-flat-button label="HIDE" class="button cancel" />
     </mu-paper>
     <!--<div class="profile-link">-->
       <!--<input v-model.trim="profileLink" placeholder="insert profile link please">-->
@@ -50,67 +53,85 @@
         <!--<input v-model.trim.number="age_to" placeholder="to">-->
       <!--</div>-->
     <!--</div>-->
-  </div>
+  <!--</div>-->
 </template>
 
 <script>
   export default {
     name: 'search',
-//    props: ['profile'],
     data () {
       return {
         picked: null,
         city: false,
+        country: 0,
         profileLink: null,
-        options: [
-          { text: 'Moscow', value: 'A' },
-          { text: 'Saint Petersburg', value: 'B' },
-          { text: 'Rostov-On-Don', value: 'C' }
-        ],
+        cities: [],
+//        cities: [
+//          { text: 'Moscow', value: 'A' },
+//          { text: 'Saint Petersburg', value: 'B' },
+//          { text: 'Rostov-On-Don', value: 'C' }
+//        ],
         age_from: null,
         age_to: null,
       }
+    },
+    watch: {
+      country(id) {
+        const country_id = this.$store.state.countries[id].cid;
+        const currentCities = this.$store.state.cities[country_id];
+//        console.log(currentCities[id].cid, this.city);
+        if (currentCities) {
+          this.city = currentCities[0].cid;
+          this.cities = currentCities;
+        } else {
+          this.$store.dispatch('getCities', {country_id})
+            .then(() => {
+              this.cities = this.$store.state.cities[country_id];
+            });
+        }
+      },
+    },
+    computed: {
+        countries () {
+          return this.$store.state.countries;
+        },
+    },
+    methods: {
+        onSubmit() {
+//            console.log(this.$data);
+        },
     }
   }
 </script>
-<style>
-  .search {
-    display: flex;
-    flex-direction: column;
-  }
+<style scoped>
   .paper {
-    margin: 10px 15px 10px 15px;
-    padding: 15px;
+    margin: 15px 0 10px 0;
+    padding: 15px 30px 20px 30px;
+    display: inline-block;
   }
-  .profile-link {
-    display: flex;
+
+  .sex-radio > div > div:nth-child(2) {
+    margin-right: 10px;
+    height: 20px;
+    width: 20px;
   }
-  .profile-link > div {
-    width: 75%;
+  .sex-radio > div > div:nth-child(3) {
+    font-size: 16px !important;
   }
-  .text-inputs {
-    display: flex;
-  }
-  .physical {
-    display: flex;
-  }
-  .age {
-    display: flex;
-    margin-left: 16px;
+  .sex-radio-icon {
+    height: 20px !important;
+    width: 20px !important;
   }
   .age > div {
-    width: 50px;
+    width: 88px;
     margin: 0;
     font-size: 14px;
   }
-  .age > div > div {
-    padding-top: 0;
-    padding-bottom: 0;
+  .button {
+    background-color: #03a9f4 !important;
+    color: #fff !important;
   }
-  .age > div > div > input {
-    height: 24px;
-  }
-  .age > div > div > div {
-    top: -5px;
+  .cancel {
+    background-color: rgb(141, 182, 204) !important;
   }
 </style>

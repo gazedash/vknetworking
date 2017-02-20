@@ -11,6 +11,8 @@ const app = new Vue({
   el: '#app',
   store,
   created() {
+    this.$store.dispatch('getCountries');
+    // this.$store.dispatch('getCities', {country_id: store.state.countries[0].cid});
     // this.$store.dispatch('getNextNext', { userId: 126125228, city: 139, has_photo: 1});
     const scrollStream = Observable.fromEvent(window, 'scroll')
       .filter(() => {
@@ -18,7 +20,7 @@ const app = new Vue({
         return isBottomOfPage();
       }).throttleTime(500);
     scrollStream.subscribe(() => {
-      app.$store.dispatch('getNextNext', { userId: 126125228, city: 139, has_photo: 1});
+      this.$store.dispatch('getNextNext', { userId: 126125228, city: 139, has_photo: 1});
     });
   },
   computed: {
@@ -26,7 +28,7 @@ const app = new Vue({
       return this.$store.getters.getProfileList
     },
     size() {
-      return this.$store.state.fetchedCommunitiesLength;
+      return this.$store.state.fetchedCommunitiesLength
     }
   },
   template: '<App :list="list" :size="size"/>',

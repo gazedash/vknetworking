@@ -21,8 +21,33 @@ export function buildGetMembersUrl(q, id, city = "", sex = 0, age_from = 0, age_
   // hometown?
 }
 
+export function buildGetCountries() {
+  return baseMethod('database.getCountries');
+}
+
+export function buildGetCities({country_id = 1, q = "", need_all = 0, count = 100}) {
+  return baseMethod('database.getCities') + `${q?"&q="+q : ""}&country_id=${country_id}` +
+    `&need_all=${need_all}&count=${count}`;
+}
+
 export function buildGetSubscriptions(userId) {
   return baseMethod('users.getSubscriptions') + `&user_id=${userId}&extended=0`;
+}
+
+export function fetchCountries() {
+  return fetch(buildGetCountries(), {mode: 'cors'})
+    .then(response => response.json())
+    .then(json => {
+      return json.response;
+    });
+}
+
+export function fetchCities({country_id = 1, q = "", need_all = 0, count = 100}) {
+  return fetch(buildGetCities({country_id, q, need_all, count}))
+    .then(response => response.json())
+    .then(json => {
+      return json.response;
+    });
 }
 
 export function fetchCommunities(userId) {
@@ -36,9 +61,7 @@ export function fetchCommunities(userId) {
 
 export function fetchMembers({q = "", id, city = "", sex = 0, age_from = 0, age_to = 0, hometown = "", has_photo = 0}) {
   return fetch(buildGetMembersUrl(q, id, city, sex, age_from, age_to, hometown, has_photo))
-    .then(response => {
-      return response.json();
-    })
+    .then(response => response.json())
     .then(json => {
       if (json.response) {
         json.response.shift()
