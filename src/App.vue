@@ -1,9 +1,5 @@
 <template>
   <div id="app">
-    <!--<div>-->
-      <!--<span>Communities: {{ size }}</span>-->
-      <!--<span>Profiles: {{ list.length }}</span>-->
-    <!--</div>-->
     <search></search>
     <person v-for="el in list" :profile="el"></person>
     <!--{{ groups }}-->

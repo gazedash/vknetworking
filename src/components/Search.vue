@@ -1,65 +1,49 @@
 <template>
-  <!--<div class="search">-->
-    <mu-paper class="paper" :zDepth="1" >
-      <div class="profile-link">
-        <mu-text-field hintText="enter id or link" label="Profile" v-model.trim="profileLink"/>
-      </div>
-      <div class="country">
-        <mu-select-field v-model="country" :labelFocusClass="['label-foucs']" label="Country">
-          <mu-menu-item v-for="country in countries" ccc="dddd" ttt="ddd" :value="country.cid" :title="country.title" />
-        </mu-select-field>
-      </div>
-      <div class="city">
-        <!--<div v-model="city">{{city}}</div>-->
-        <!--<div v-model="country">{{typeof country}} {{country}}</div>-->
-        <mu-select-field v-model="city" :labelFocusClass="['label-foucs']" label="City">
-          <mu-menu-item v-for="city in cities" ccc="dddd" ttt="ddd" :value="city.cid" :title="city.title" />
-        </mu-select-field>
-      </div>
-      <div class="sex">
-        <mu-radio iconClass="sex-radio-icon" label="Male" name="group" nativeValue="2" v-model="sex" class="sex-radio"/>
-        <mu-radio iconClass="sex-radio-icon" label="Female" name="group" nativeValue="1" v-model="sex"  class="sex-radio"/>
-        <mu-radio iconClass="sex-radio-icon" label="All" name="group" nativeValue="0" v-model="sex"  class="sex-radio"/>
-      </div>
-      <div class="age">
-        <mu-text-field hintText="from" v-model.trim.number="age_from"/>
-        <mu-text-field hintText="to" v-model.trim.number="age_to"/>
-      </div>
-      <mu-flat-button @click="onSubmit" label="GO!" class="button" />
-      <mu-flat-button label="HIDE" class="button cancel" />
-    </mu-paper>
-    <!--<div class="profile-link">-->
-      <!--<input v-model.trim="profileLink" placeholder="insert profile link please">-->
-    <!--</div>-->
-    <!--<div class="sex">-->
-      <!--<input type="radio" id="male" value="Male" v-model="picked">-->
-      <!--<label for="male">Male</label>-->
-      <!--<input type="radio" id="female" value="Female" v-model="picked">-->
-      <!--<label for="female">Female</label>-->
-      <!--<input type="radio" id="all" value="All" v-model="picked">-->
-      <!--<label for="all">All</label>-->
-    <!--</div>-->
-    <!--<div class="city">-->
-      <!--<select v-model="city">-->
-        <!--<option v-for="option in options" :value="option.value">-->
-          <!--{{ option.text }}-->
-        <!--</option>-->
-      <!--</select>-->
-    <!--</div>-->
-    <!--<div class="age">-->
-      <!--<div class="age_from">-->
-        <!--<input v-model.trim.number="age_from" placeholder="from">-->
-        <!--<span class="bar"></span>-->
-      <!--</div>-->
-      <!--<div class="age_to">-->
-        <!--<input v-model.trim.number="age_to" placeholder="to">-->
-      <!--</div>-->
-    <!--</div>-->
-  <!--</div>-->
+  <div class="search">
+    <mu-icon-button class="more" @click="open('top')">
+      <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+        <path fill="#000000" d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
+      </svg>
+    </mu-icon-button>
+    <div>Communities: {{ size }} Profiles: {{ list.length }}</div>
+    <mu-popup position="top" :overlay="false" popupClass="demo-popup-top" :open="topPopup">
+      <mu-paper class="paper" :zDepth="1" >
+        <div class="profile-link">
+          <mu-text-field hintText="enter id or link" label="Profile" v-model.trim="profileLink"/>
+        </div>
+        <div class="profile-link">
+          <mu-text-field hintText="enter search query" label="Search query" v-model.trim="query"/>
+        </div>
+        <div class="country">
+          <mu-select-field v-model="country" :labelFocusClass="['label-foucs']" label="Country">
+            <mu-menu-item v-for="country in countries" ccc="dddd" ttt="ddd" :value="country.cid" :title="country.title" />
+          </mu-select-field>
+        </div>
+        <div class="city">
+          <mu-select-field v-model="city" :labelFocusClass="['label-foucs']" label="City">
+            <mu-menu-item v-for="city in cities" ccc="dddd" ttt="ddd" :value="city.cid" :title="city.title" />
+          </mu-select-field>
+        </div>
+        <div class="sex">
+          <mu-radio iconClass="sex-radio-icon" label="Male" name="group" nativeValue="2" v-model="sex" class="sex-radio"/>
+          <mu-radio iconClass="sex-radio-icon" label="Female" name="group" nativeValue="1" v-model="sex"  class="sex-radio"/>
+          <mu-radio iconClass="sex-radio-icon" label="All" name="group" nativeValue="0" v-model="sex"  class="sex-radio"/>
+        </div>
+        <div class="age">
+          <mu-text-field hintText="from" v-model.trim.number="age_from"/>
+          <mu-text-field hintText="to" v-model.trim.number="age_to"/>
+        </div>
+        <mu-flat-button @click="onSubmit" label="GO!" class="button" />
+        <mu-flat-button @click="close('top')" label="HIDE" class="button cancel" />
+      </mu-paper>
+    </mu-popup>
+  </div>
 </template>
 
 <script>
   import {getUserName} from "../vk_api/index";
+  import {isBottomOfPage} from "../utils/index";
+  import {Observable} from "rxjs/Rx";
   export default {
     name: 'search',
     data () {
@@ -68,9 +52,11 @@
         city: null,
         country: null,
         profileLink: null,
+        query: null,
         cities: [],
         age_from: null,
         age_to: null,
+        topPopup: false,
       }
     },
     watch: {
@@ -90,6 +76,12 @@
       },
     },
     computed: {
+        list () {
+          return this.$store.getters.getProfileList
+        },
+        size() {
+          return this.$store.state.fetchedCommunitiesLength
+        },
         countries () {
           return this.$store.state.countries;
         },
@@ -97,26 +89,54 @@
     beforeUpdate() {
         this.country = this.$store.state.countries[0].cid;
     },
+    created () {
+      const scrollStream = Observable.fromEvent(window, 'scroll')
+        .filter(() => {
+          if (isBottomOfPage()) console.log("Bottom of page");
+          return isBottomOfPage();
+        }).throttleTime(500);
+      scrollStream.subscribe(() => {
+          this.onSubmit();
+      });
+    },
     methods: {
+        open (position) {
+          this[position + 'Popup'] = true
+        },
+        close (position) {
+          this[position + 'Popup'] = false
+        },
         onSubmit() {
-         let res = getUserName(this.$data.profileLink);
-         if (!Number.isInteger(res)) {
-           this.$store.dispatch('getUser', res).then((data) => {
-             res = data.uid;
+         let userId = getUserName(this.$data.profileLink);
+         if (!Number.isInteger(userId)) {
+           this.$store.dispatch('getUser', userId).then((data) => {
+             userId = data.uid;
            })
          }
-         console.log(this.$data, res);
+         const {sex, age_from, age_to, city, country, query: q} = this.$data;
+         console.log(sex, age_from, age_to, city, country, userId, q);
+           this.$store.dispatch('getNextNext', { userId, city, sex, age_from, age_to, country, q, has_photo: 1});
         },
     },
   }
 </script>
 <style scoped>
+  .search {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+  .more {
+    padding: 0;
+    width: 32px;
+    height: 32px;
+  }
+  .stats {
+  }
   .paper {
     margin: 15px 0 10px 0;
     padding: 15px 30px 20px 30px;
     display: inline-block;
   }
-
   .sex-radio > div > div:nth-child(2) {
     margin-right: 10px;
     height: 20px;
