@@ -6,12 +6,14 @@
       </div>
       <div class="country">
         <mu-select-field v-model="country" :labelFocusClass="['label-foucs']" label="Country">
-          <mu-menu-item v-for="text,index in countries" ccc="dddd" ttt="ddd" :value="String(index)" :title="text.title" />
+          <mu-menu-item v-for="country in countries" ccc="dddd" ttt="ddd" :value="country.cid" :title="country.title" />
         </mu-select-field>
       </div>
       <div class="city">
-        <mu-select-field :city="city" :labelFocusClass="['label-foucs']" label="City">
-          <mu-menu-item v-for="text,index in cities" ccc="dddd" ttt="ddd" :value="String(index)" :title="text.title" />
+        <!--<div v-model="city">{{city}}</div>-->
+        <!--<div v-model="country">{{typeof country}} {{country}}</div>-->
+        <mu-select-field v-model="city" :labelFocusClass="['label-foucs']" label="City">
+          <mu-menu-item v-for="city in cities" ccc="dddd" ttt="ddd" :value="city.cid" :title="city.title" />
         </mu-select-field>
       </div>
       <div class="sex">
@@ -62,8 +64,7 @@
     data () {
       return {
         picked: null,
-        city: false,
-        country: 0,
+        city: null,
         profileLink: null,
         cities: [],
 //        cities: [
@@ -76,23 +77,34 @@
       }
     },
     watch: {
-      country(id) {
-        const country_id = this.$store.state.countries[id].cid;
+      country(country_id) {
         const currentCities = this.$store.state.cities[country_id];
-//        console.log(currentCities[id].cid, this.city);
         if (currentCities) {
-          this.city = currentCities[0].cid;
+          console.log('already loaded');
           this.cities = currentCities;
+          this.city = currentCities[0].cid;
         } else {
+          console.log('load cities');
           this.$store.dispatch('getCities', {country_id})
             .then(() => {
-              this.cities = this.$store.state.cities[country_id];
+              const currentCities = this.$store.state.cities[country_id];
+              this.cities = currentCities;
+              this.city = currentCities[0].cid;
             });
         }
       },
     },
     computed: {
+        country () {
+          if (this.$store.state.countries.length) {
+              return this.$store.state.countries[0].cid;
+          } else {
+              return 0;
+          }
+        },
         countries () {
+//            console.log(this.country, this.$store.state.countries[0]);
+          console.log(this.$store.state.countries);
           return this.$store.state.countries;
         },
     },
@@ -100,7 +112,7 @@
         onSubmit() {
 //            console.log(this.$data);
         },
-    }
+    },
   }
 </script>
 <style scoped>
