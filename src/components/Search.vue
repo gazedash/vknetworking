@@ -1,13 +1,15 @@
 <template>
-  <div class="search">
-    <mu-icon-button class="more" @click="open('top')">
-      <svg style="width:24px;height:24px" viewBox="0 0 24 24">
-        <path fill="#000000" d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
-      </svg>
-    </mu-icon-button>
-    <div>Communities: {{ size }} Profiles: {{ list.length }}</div>
+  <div>
+    <mu-appbar title="VKNetworkingHelper" :zDepth="1">
+      <div slot="right" class="stats">Communities: {{ size }} Profiles: {{ list.length }}</div>
+      <mu-icon-button slot="right" class="more" @click="open('top')">
+        <svg style="width:32px;height:32px" viewBox="0 0 24 24">
+          <path fill="#000000" d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
+        </svg>
+      </mu-icon-button>
+    </mu-appbar>
     <mu-popup position="top" :overlay="false" popupClass="demo-popup-top" :open="topPopup">
-      <mu-paper class="paper" :zDepth="1" >
+      <mu-paper class="paper" :zDepth="2" >
         <div class="profile-link">
           <mu-text-field hintText="enter id or link" label="Profile" v-model.trim="profileLink"/>
         </div>
@@ -33,8 +35,10 @@
           <mu-text-field hintText="from" v-model.trim.number="age_from"/>
           <mu-text-field hintText="to" v-model.trim.number="age_to"/>
         </div>
-        <mu-flat-button @click="onSubmit" label="GO!" class="button" />
-        <mu-flat-button @click="close('top')" label="HIDE" class="button cancel" />
+        <div class="control">
+          <mu-flat-button @click="onSubmit" label="GO!" class="button" />
+          <mu-flat-button @click="close('top')" label="HIDE" class="button cancel" />
+        </div>
       </mu-paper>
     </mu-popup>
   </div>
@@ -43,7 +47,7 @@
 <script>
   import {getUserName} from "../vk_api/index";
   import {isBottomOfPage} from "../utils/index";
-  import {Observable} from "rxjs/Rx";
+  import throttle from 'lodash/throttle';
   export default {
     name: 'search',
     data () {
@@ -90,14 +94,11 @@
         this.country = this.$store.state.countries[0].cid;
     },
     created () {
-      const scrollStream = Observable.fromEvent(window, 'scroll')
-        .filter(() => {
-          if (isBottomOfPage()) console.log("Bottom of page");
-          return isBottomOfPage();
-        }).throttleTime(500);
-      scrollStream.subscribe(() => {
-          this.onSubmit();
-      });
+        window.addEventListener('scroll', throttle(() => {
+            if (isBottomOfPage()) {
+              this.onSubmit();
+            }
+        }, 500));
     },
     methods: {
         open (position) {
@@ -121,38 +122,36 @@
   }
 </script>
 <style scoped>
-  .search {
-    display: flex;
-    flex-direction: row-reverse;
-  }
   .more {
     padding: 0;
     width: 32px;
     height: 32px;
   }
+  .more > div > svg > path {
+    fill: white;
+  }
   .stats {
+    font-size: 16px;
   }
   .paper {
-    margin: 15px 0 10px 0;
     padding: 15px 30px 20px 30px;
-    display: inline-block;
   }
-  .sex-radio > div > div:nth-child(2) {
-    margin-right: 10px;
-    height: 20px;
-    width: 20px;
+  .sex {
+    display: flex;
+    justify-content: space-around;
   }
-  .sex-radio > div > div:nth-child(3) {
-    font-size: 16px !important;
-  }
-  .sex-radio-icon {
-    height: 20px !important;
-    width: 20px !important;
+  .age {
+    display: flex;
+    justify-content: center;
   }
   .age > div {
-    width: 88px;
-    margin: 0;
+    margin: 5px 10px;
+    width: 40px;
     font-size: 14px;
+  }
+  .control {
+    display: flex;
+    justify-content: center;
   }
   .button {
     background-color: #03a9f4 !important;
