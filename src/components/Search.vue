@@ -17,9 +17,9 @@
         </mu-select-field>
       </div>
       <div class="sex">
-        <mu-radio iconClass="sex-radio-icon" label="Male" name="group" nativeValue="2" v-model="picked" class="sex-radio"/>
-        <mu-radio iconClass="sex-radio-icon" label="Female" name="group" nativeValue="1" v-model="picked"  class="sex-radio"/>
-        <mu-radio iconClass="sex-radio-icon" label="All" name="group" nativeValue="0" v-model="picked"  class="sex-radio"/>
+        <mu-radio iconClass="sex-radio-icon" label="Male" name="group" nativeValue="2" v-model="sex" class="sex-radio"/>
+        <mu-radio iconClass="sex-radio-icon" label="Female" name="group" nativeValue="1" v-model="sex"  class="sex-radio"/>
+        <mu-radio iconClass="sex-radio-icon" label="All" name="group" nativeValue="0" v-model="sex"  class="sex-radio"/>
       </div>
       <div class="age">
         <mu-text-field hintText="from" v-model.trim.number="age_from"/>
@@ -59,19 +59,16 @@
 </template>
 
 <script>
+  import {getUserName} from "../vk_api/index";
   export default {
     name: 'search',
     data () {
       return {
-        picked: null,
+        sex: null,
         city: null,
+        country: null,
         profileLink: null,
         cities: [],
-//        cities: [
-//          { text: 'Moscow', value: 'A' },
-//          { text: 'Saint Petersburg', value: 'B' },
-//          { text: 'Rostov-On-Don', value: 'C' }
-//        ],
         age_from: null,
         age_to: null,
       }
@@ -80,11 +77,9 @@
       country(country_id) {
         const currentCities = this.$store.state.cities[country_id];
         if (currentCities) {
-          console.log('already loaded');
           this.cities = currentCities;
           this.city = currentCities[0].cid;
         } else {
-          console.log('load cities');
           this.$store.dispatch('getCities', {country_id})
             .then(() => {
               const currentCities = this.$store.state.cities[country_id];
@@ -95,22 +90,22 @@
       },
     },
     computed: {
-        country () {
-          if (this.$store.state.countries.length) {
-              return this.$store.state.countries[0].cid;
-          } else {
-              return 0;
-          }
-        },
         countries () {
-//            console.log(this.country, this.$store.state.countries[0]);
-          console.log(this.$store.state.countries);
           return this.$store.state.countries;
         },
     },
+    beforeUpdate() {
+        this.country = this.$store.state.countries[0].cid;
+    },
     methods: {
         onSubmit() {
-//            console.log(this.$data);
+         let res = getUserName(this.$data.profileLink);
+         if (!Number.isInteger(res)) {
+           this.$store.dispatch('getUser', res).then((data) => {
+             res = data.uid;
+           })
+         }
+         console.log(this.$data, res);
         },
     },
   }

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {fetchCommunities, fetchMembers, fetchCountries, fetchCities} from "../vk_api/index";
+import {fetchCommunities, fetchMembers, fetchCountries, fetchCities, fetchUser} from "../vk_api/index";
 import uniqBy from 'lodash/uniqBy';
 
 Vue.use(Vuex);
@@ -12,6 +12,7 @@ const state = {
   communityIdList: [],
   countries: [],
   cities: {},
+  users: {},
 };
 
 // mutations are operations that actually mutates the state.
@@ -32,6 +33,9 @@ const mutations = {
   getProfilesFromCommunity (state, {items}) {
     state.profileList = uniqBy(state.profileList.concat(items), 'uid');
   },
+  getUser (state, {items}) {
+    state.users[items.uid] = items;
+  },
   getCountries (state, {items}) {
     state.countries = uniqBy(state.countries.concat(items), 'cid');
   },
@@ -50,15 +54,27 @@ const mutations = {
 // asynchronous operations.
 const actions = {
   setIndex: ({ commit }, index) => commit('setIndex', index),
+  getUser ({ commit }, uid) {
+    return fetchUser(uid)
+      .then((items) => {
+        items.screen_name = uid;
+        commit('getUser', {items});
+        return items;
+      });
+  },
   getCountries ({ commit }) {
     return fetchCountries()
       .then((items) => {
-        return commit('getCountries', {items});
+        commit('getCountries', {items});
+        return items;
       });
   },
   getCities ({commit}, payload) {
     return fetchCities(payload)
-      .then((items) => commit('getCities', {items, country_id: payload.country_id}));
+      .then((items) => {
+        commit('getCities', {items, country_id: payload.country_id});
+        return items;
+      });
   },
   getCommunityIdList ({ commit }, userId) {
     return fetchCommunities(userId)
