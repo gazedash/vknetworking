@@ -1,7 +1,7 @@
 <template>
   <div class="el">
     <div>
-      <a :href="'https://vk.com/id' + profile.uid">
+      <a :href="'https://vk.com/id' + profile.uid" target="_blank">
         <div class="image">
           <img :src="profile.photo_max"/>
         </div>

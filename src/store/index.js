@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import {fetchCommunities, fetchMembers, fetchCountries, fetchCities, fetchUser} from "../vk_api/index";
 import uniqBy from 'lodash/uniqBy';
+import {uniq} from "lodash";
 
 Vue.use(Vuex);
 
@@ -9,7 +10,7 @@ const state = {
   index: 0,
   fetchedCommunitiesLength: 0,
   profileList: [],
-  communityIdList: [],
+  communityIdList: {},
   countries: {NaN: {cid: NaN, title: 'Not specified'}},
   cities: {NaN: [{cid: NaN, title: 'Not specified'}]},
   users: {},
@@ -27,8 +28,8 @@ const mutations = {
   fetchedCommunitiesLength (state) {
     state.fetchedCommunitiesLength++;
   },
-  getCommunityIdList (state, {items}) {
-    state.communityIdList = state.communityIdList.concat(items)
+  getCommunityIdList (state, {items, userId}) {
+    state.communityIdList[userId] = uniq(items.concat(state.communityIdList[userId]));
   },
   getProfilesFromCommunity (state, {items}) {
     state.profileList = uniqBy(state.profileList.concat(items), 'uid');
@@ -78,7 +79,7 @@ const actions = {
   getCommunityIdList ({ commit }, userId) {
     return fetchCommunities(userId)
       .then((items) => {
-        commit('getCommunityIdList', {items});
+        commit('getCommunityIdList', {items, userId});
         return items;
       });
   },
@@ -90,20 +91,27 @@ const actions = {
         return items;
       });
   },
-  getNext ({ dispatch, commit, state }, payload) {
+  getNextNext ({ dispatch, commit, state }, payload) {
     return dispatch('getCommunityIdList', payload.userId)
-      .then(items => dispatch('getProfilesFromCommunity', {
-        id: items[state.index], ...payload
-      }).then(items => {
-        if (items) {
-          commit('setIndex', state.index + 1);
-          commit('getNext', {items});
-          return items;
-        }
-        // in case if there are no items:
-        // const index = getters.getStateIndex(state);
-        // actions.getNext({commit, state}, payload);
-      }));
+    // return actions.getCommunityIdList({ commit }, payload.userId)
+      .then(items => {
+        return actions.getNext({ dispatch, commit, state }, { items, ...payload});
+      });
+  },
+  getNext ({ dispatch, commit, state }, {items, ...payload}) {
+    // payload is options for profile searching
+    items = items ? items : state.communityIdList[payload.userId];
+    return dispatch('getProfilesFromCommunity', {
+      id: items[state.index], ...payload
+    }).then(items => {
+      if (items) {
+        commit('setIndex', state.index + 1);
+        return commit('getNext', {items});
+      }
+      // in case if there are no items:
+      // const index = getters.getStateIndex(state);
+      // actions.getNext({commit, state}, payload);
+    })
   },
 };
 

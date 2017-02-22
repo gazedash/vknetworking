@@ -100,17 +100,24 @@
         close (position) {
           this[position + 'Popup'] = false
         },
+        finallyFetch(userId) {
+          console.log('finallyFetch', userId);
+          const {sex, age_from, age_to, city, country, query: q} = this.$data;
+          const payload = { userId, city, sex, age_from, age_to, country, q, has_photo: 1};
+          if (this.$store.state.communityIdList[[userId]]) {
+            this.$store.dispatch('getNext', payload);
+          } else {
+            this.$store.dispatch('getNextNext', payload)
+          }
+        },
         onSubmit() {
+          let self = this;
           this.close('top');
           let userId = getUserName(this.$data.profileLink);
-         if (!Number.isInteger(userId)) {
-           this.$store.dispatch('getUser', userId).then((data) => {
-             userId = data.uid;
-           })
-         }
-         const {sex, age_from, age_to, city, country, query: q} = this.$data;
-         console.log(sex, age_from, age_to, city, country, userId, q);
-         this.$store.dispatch('getNext', { userId, city, sex, age_from, age_to, country, q, has_photo: 1});
+          console.log('onSubmit', userId, {self});
+           if (!Number.isInteger(userId)) {
+             this.$store.dispatch('getUser', userId).then((data) => self.finallyFetch(data.uid))
+           } else this.finallyFetch(userId);
         },
     },
   }

@@ -11,7 +11,6 @@ function baseMethod(method) {
 
 export function buildGetMembersUrl({q, id, city = "", sex = 0, age_from = 0, age_to = 0, hometown = "", has_photo = 0}) {
   // sex=1: female
-  console.log(sex, age_from, age_to);
   return baseMethod('users.search') +
     `${q ? "&q=" + q : ""}${hometown ? "&hometown=" + hometown : ""}&group_id=${id}` +
     `&fields=photo_max,first_name,last_name&online=0` +
@@ -40,6 +39,7 @@ export function buildGetUser(id) {
 }
 
 export function getUserName(profileLink) {
+  console.log('getUserName', {profileLink});
   const id = parseInt(profileLink) || parseInt(profileLink.split('id')[1]);
   const link = profileLink.split('vk.com/')[1];
   return id ? id : link ? link : profileLink;
