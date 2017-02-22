@@ -10,8 +10,8 @@ const state = {
   fetchedCommunitiesLength: 0,
   profileList: [],
   communityIdList: [],
-  countries: [],
-  cities: {},
+  countries: {NaN: {cid: NaN, title: 'Not specified'}},
+  cities: {NaN: [{cid: NaN, title: 'Not specified'}]},
   users: {},
 };
 
@@ -37,13 +37,12 @@ const mutations = {
     state.users[items.uid] = items;
   },
   getCountries (state, {items}) {
-    state.countries = uniqBy(state.countries.concat(items), 'cid');
+    const countries = Object.assign({}, state.countries);
+    items.forEach((country) => countries[country.cid] = country);
+    state.countries = countries;
   },
   getCities (state, {items, country_id}) {
-    state.cities[country_id] = items;
-  },
-  getNextNext (state, {items}) {
-    mutations.getNext(state, {items});
+    state.cities[country_id] = [...items, {cid: NaN, title: 'Not specified'}];
   },
   getNext (state, {items}) {
     mutations.getProfilesFromCommunity(state, {items});
@@ -91,25 +90,20 @@ const actions = {
         return items;
       });
   },
-  getNextNext ({ dispatch, commit, state }, payload) {
+  getNext ({ dispatch, commit, state }, payload) {
     return dispatch('getCommunityIdList', payload.userId)
-    // return actions.getCommunityIdList({ commit }, payload.userId)
-      .then(items => {
-        return actions.getNext({ dispatch, commit, state }, { items, ...payload});
-      });
-  },
-  getNext ({ dispatch, commit, state }, {items, ...payload}) {
-    // payload is options for profile searching
-    return dispatch('getProfilesFromCommunity', {
-    id: items[state.index], ...payload
-  }).then(items => {
+      .then(items => dispatch('getProfilesFromCommunity', {
+        id: items[state.index], ...payload
+      }).then(items => {
         if (items) {
           commit('setIndex', state.index + 1);
-          return commit('getNext', {items});
+          commit('getNext', {items});
+          return items;
         }
+        // in case if there are no items:
         // const index = getters.getStateIndex(state);
         // actions.getNext({commit, state}, payload);
-      })
+      }));
   },
 };
 

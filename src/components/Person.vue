@@ -2,7 +2,9 @@
   <div class="el">
     <div>
       <a :href="'https://vk.com/id' + profile.uid">
-        <img :src="profile.photo_max"/>
+        <div class="image">
+          <img :src="profile.photo_max"/>
+        </div>
         <div class="name">{{ profile.first_name }} {{ profile.last_name }}</div>
       </a>
     </div>
@@ -22,18 +24,27 @@
 </script>
 
 <style scoped>
+  img {
+    height: 200px;
+    width: 200px;
+  }
   a {
+    display: block;
     text-decoration: none;
     color: black;
   }
+  .image {
+    display: flex;
+    justify-content: center;
+  }
   .name {
-    padding: 7px 0 8px 0;
+    overflow: hidden;
+    padding: 8px 0 8px 0;
     text-align: center;
   }
-
   .el {
-    box-shadow: 0 27px 55px 0 rgba(0, 0, 0, 0.15), 0 7px 12px 0 rgba(0, 0, 0, 0.15);
-    display: inline-block;
+    box-shadow: 0 27px 55px 0 rgba(0, 0, 0, 0.1), 0 7px 12px 0 rgba(0, 0, 0, 0.10);
+    display: inline-flex;
     /*border-radius: 2px;*/
     background-color: #fafafa;
     margin: 10px;

@@ -9,12 +9,13 @@ function baseMethod(method) {
   return `${endpoint}/method/${method}?access_token=${api_key}`
 }
 
-export function buildGetMembersUrl(q, id, city = "", sex = 0, age_from = 0, age_to = 0, hometown = "", has_photo = 0) {
+export function buildGetMembersUrl({q, id, city = "", sex = 0, age_from = 0, age_to = 0, hometown = "", has_photo = 0}) {
   // sex=1: female
+  console.log(sex, age_from, age_to);
   return baseMethod('users.search') +
     `${q ? "&q=" + q : ""}${hometown ? "&hometown=" + hometown : ""}&group_id=${id}` +
     `&fields=photo_max,first_name,last_name&online=0` +
-    `${city ? "&city=" + city : ""}&sex=${sex}` +
+    `${city ? "&city=" + city : ""}&sex=${sex ? sex : 0}` +
     `${age_from ? "&age_from=" + age_from : ""}` +
     `${age_to ? "&age_to=" + age_to : ""}` +
     `&has_photo=${has_photo}&count=1000`;
@@ -77,8 +78,8 @@ export function fetchCommunities(userId) {
   // .then(json => json.response.groups.items);
 }
 
-export function fetchMembers({q = "", id, city = "", sex = 0, age_from = 0, age_to = 0, hometown = "", has_photo = 0}) {
-  return fetch(buildGetMembersUrl(q, id, city, sex, age_from, age_to, hometown, has_photo))
+export function fetchMembers({q, id, city, sex, age_from, age_to, hometown, has_photo}) {
+  return fetch(buildGetMembersUrl({q, id, city, sex, age_from, age_to, hometown, has_photo}))
     .then(response => response.json())
     .then(json => {
       if (json.response) {

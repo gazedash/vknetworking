@@ -15,10 +15,10 @@ const app = new Vue({
     list () {
       return this.$store.getters.getProfileList
     },
-    size() {
+    size () {
       return this.$store.state.fetchedCommunitiesLength
-    }
+    },
   },
-  template: '<App :list="list"/>',
+  template: '<App :size="size" :list="list"/>',
   components: { App }
 });

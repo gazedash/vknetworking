@@ -1,4 +1,4 @@
-# vue-vk-groups-members-to-set2
+# VKNetworking
 
 > A Vue.js project
 

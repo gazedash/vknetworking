@@ -1,19 +1,18 @@
 <template>
   <div>
-    <mu-appbar title="VKNetworkingHelper" :zDepth="1">
-      <div slot="right" class="stats">Communities: {{ size }} Profiles: {{ list.length }}</div>
+    <mu-appbar class="app-bar" title="VKNetworking" :zDepth="1">
       <mu-icon-button slot="right" class="more" @click="open('top')">
         <svg style="width:32px;height:32px" viewBox="0 0 24 24">
           <path fill="#000000" d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
         </svg>
       </mu-icon-button>
     </mu-appbar>
-    <mu-popup position="top" :overlay="false" popupClass="demo-popup-top" :open="topPopup">
+    <mu-popup position="top" popupClass="popup" :open="topPopup" @close="close('top')">
       <mu-paper class="paper" :zDepth="2" >
         <div class="profile-link">
-          <mu-text-field hintText="enter id or link" label="Profile" v-model.trim="profileLink"/>
+          <mu-text-field hintText="enter id or link" label="Profile" v-model.trim="profileLink" />
         </div>
-        <div class="profile-link">
+        <div class="search">
           <mu-text-field hintText="enter search query" label="Search query" v-model.trim="query"/>
         </div>
         <div class="country">
@@ -36,8 +35,8 @@
           <mu-text-field hintText="to" v-model.trim.number="age_to"/>
         </div>
         <div class="control">
-          <mu-flat-button @click="onSubmit" label="GO!" class="button" />
-          <mu-flat-button @click="close('top')" label="HIDE" class="button cancel" />
+          <mu-flat-button @click="onSubmit" label="GO!" />
+          <mu-flat-button @click="close('top')" label="HIDE" />
         </div>
       </mu-paper>
     </mu-popup>
@@ -60,7 +59,7 @@
         cities: [],
         age_from: null,
         age_to: null,
-        topPopup: false,
+        topPopup: true,
       }
     },
     watch: {
@@ -80,25 +79,19 @@
       },
     },
     computed: {
-        list () {
-          return this.$store.getters.getProfileList
-        },
-        size() {
-          return this.$store.state.fetchedCommunitiesLength
-        },
         countries () {
           return this.$store.state.countries;
         },
     },
     beforeUpdate() {
-        this.country = this.$store.state.countries[0].cid;
+        this.country = this.$store.state.countries[1].cid;
     },
     created () {
-        window.addEventListener('scroll', throttle(() => {
-            if (isBottomOfPage()) {
-              this.onSubmit();
-            }
-        }, 500));
+      window.addEventListener('scroll', throttle(() => {
+        if (isBottomOfPage()) {
+          this.onSubmit();
+        }
+      }, 500));
     },
     methods: {
         open (position) {
@@ -108,7 +101,8 @@
           this[position + 'Popup'] = false
         },
         onSubmit() {
-         let userId = getUserName(this.$data.profileLink);
+          this.close('top');
+          let userId = getUserName(this.$data.profileLink);
          if (!Number.isInteger(userId)) {
            this.$store.dispatch('getUser', userId).then((data) => {
              userId = data.uid;
@@ -116,12 +110,16 @@
          }
          const {sex, age_from, age_to, city, country, query: q} = this.$data;
          console.log(sex, age_from, age_to, city, country, userId, q);
-           this.$store.dispatch('getNextNext', { userId, city, sex, age_from, age_to, country, q, has_photo: 1});
+         this.$store.dispatch('getNext', { userId, city, sex, age_from, age_to, country, q, has_photo: 1});
         },
     },
   }
 </script>
 <style scoped>
+  .app-bar {
+    position: fixed;
+    top: 0;
+  }
   .more {
     padding: 0;
     width: 32px;
@@ -130,11 +128,8 @@
   .more > div > svg > path {
     fill: white;
   }
-  .stats {
-    font-size: 16px;
-  }
   .paper {
-    padding: 15px 30px 20px 30px;
+    padding: 14px 25px 14px 25px;
   }
   .sex {
     display: flex;
@@ -142,22 +137,18 @@
   }
   .age {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
   }
   .age > div {
     margin: 5px 10px;
     width: 40px;
     font-size: 14px;
   }
+  .age > div:first-child {
+    margin-left: 0;
+  }
   .control {
     display: flex;
-    justify-content: center;
-  }
-  .button {
-    background-color: #03a9f4 !important;
-    color: #fff !important;
-  }
-  .cancel {
-    background-color: rgb(141, 182, 204) !important;
+    justify-content: flex-end;
   }
 </style>
