@@ -8,17 +8,6 @@ Vue.use(MuseUI);
 const app = new Vue({
   el: '#app',
   store,
-  created() {
-    this.$store.dispatch('getCountries');
-  },
-  computed: {
-    list () {
-      return this.$store.getters.getProfileList
-    },
-    size () {
-      return this.$store.state.fetchedCommunitiesLength
-    },
-  },
-  template: '<App :size="size" :list="list"/>',
+  template: '<App />',
   components: { App }
 });

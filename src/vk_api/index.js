@@ -1,10 +1,10 @@
 
 //const api_key = "API_KEY";
 // https://api.vk.com/method/users.search?group_id=97408246&fields=photo_max,first_name,last_name&online=0&city=139&sex=0&has_photo=1&access_token=API_KEY
-import fetch from "isomorphic-fetch";
+import fetchJsonp from "fetch-jsonp";
 const api_key = "API_KEY";
 const endpoint = "https://api.vk.com";
-//
+
 function baseMethod(method) {
   return `${endpoint}/method/${method}?access_token=${api_key}`
 }
@@ -39,14 +39,13 @@ export function buildGetUser(id) {
 }
 
 export function getUserName(profileLink) {
-  console.log('getUserName', {profileLink});
   const id = parseInt(profileLink) || parseInt(profileLink.split('id')[1]);
   const link = profileLink.split('vk.com/')[1];
   return id ? id : link ? link : profileLink;
 }
 
 export function fetchUser(id) {
-  return fetch(buildGetUser(id), {mode: 'cors'})
+  return fetchJsonp(buildGetUser(id))
     .then(response => response.json())
     .then(json => {
       return json.response[0];
@@ -54,15 +53,17 @@ export function fetchUser(id) {
 }
 
 export function fetchCountries() {
-  return fetch(buildGetCountries(), {mode: 'cors'})
-    .then(response => response.json())
+  return fetchJsonp(buildGetCountries())
+    .then(response => {
+      return response.json();
+    })
     .then(json => {
       return json.response;
     });
 }
 
 export function fetchCities({country_id = 1, q = "", need_all = 0, count = 100}) {
-  return fetch(buildGetCities({country_id, q, need_all, count}))
+  return fetchJsonp(buildGetCities({country_id, q, need_all, count}))
     .then(response => response.json())
     .then(json => {
       return json.response;
@@ -70,16 +71,16 @@ export function fetchCities({country_id = 1, q = "", need_all = 0, count = 100})
 }
 
 export function fetchCommunities(userId) {
-  return Promise.resolve(
-    JSON.parse("MOCK_DATA")
-  ).then(data => data);
-  // return fetch(buildGetSubscriptions(userId), {mode: 'cors'})
-  // .then(response => response.json())
-  // .then(json => json.response.groups.items);
+  // return Promise.resolve(
+  //   JSON.parse("MOCK_DATA")
+  // ).then(data => data);
+  return fetchJsonp(buildGetSubscriptions(userId))
+  .then(response => response.json())
+  .then(json => json.response.groups.items);
 }
 
 export function fetchMembers({q, id, city, sex, age_from, age_to, hometown, has_photo}) {
-  return fetch(buildGetMembersUrl({q, id, city, sex, age_from, age_to, hometown, has_photo}))
+  return fetchJsonp(buildGetMembersUrl({q, id, city, sex, age_from, age_to, hometown, has_photo}))
     .then(response => response.json())
     .then(json => {
       if (json.response) {

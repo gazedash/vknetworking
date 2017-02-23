@@ -87,6 +87,7 @@
         this.country = this.$store.state.countries[1].cid;
     },
     created () {
+      this.$store.dispatch('getCountries');
       window.addEventListener('scroll', throttle(() => {
         if (isBottomOfPage()) {
           this.onSubmit();
@@ -101,7 +102,6 @@
           this[position + 'Popup'] = false
         },
         finallyFetch(userId) {
-          console.log('finallyFetch', userId);
           const {sex, age_from, age_to, city, country, query: q} = this.$data;
           const payload = { userId, city, sex, age_from, age_to, country, q, has_photo: 1};
           if (this.$store.state.communityIdList[[userId]]) {
@@ -114,7 +114,6 @@
           let self = this;
           this.close('top');
           let userId = getUserName(this.$data.profileLink);
-          console.log('onSubmit', userId, {self});
            if (!Number.isInteger(userId)) {
              this.$store.dispatch('getUser', userId).then((data) => self.finallyFetch(data.uid))
            } else this.finallyFetch(userId);
