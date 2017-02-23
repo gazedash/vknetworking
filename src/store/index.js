@@ -13,6 +13,7 @@ const state = {
   communityIdList: {},
   countries: {NaN: {cid: NaN, title: 'Not specified'}},
   cities: {NaN: [{cid: NaN, title: 'Not specified'}]},
+  aliases: {},
   users: {},
 };
 
@@ -22,6 +23,9 @@ const state = {
 // mutations must be synchronous and can be recorded by plugins
 // for debugging purposes.
 const mutations = {
+  bindAlisToUserId (state, {alias, userId}) {
+    state.aliases[alias] = userId;
+  },
   setIndex (state, index) {
     state.index = index
   },
@@ -59,6 +63,9 @@ const actions = {
       .then((items) => {
         items.screen_name = uid;
         commit('getUser', {items});
+        if (items && items.uid) {
+          commit('bindAlisToUserId', {alias: uid, userId: items.uid});
+        }
         return items;
       });
   },
@@ -105,11 +112,12 @@ const actions = {
       id: items[state.index], ...payload
     }).then(items => {
       if (items) {
+        console.log(state.index);
         commit('setIndex', state.index + 1);
+        console.log(state.index);
         return commit('getNext', {items});
       }
       // in case if there are no items:
-      // const index = getters.getStateIndex(state);
       // actions.getNext({commit, state}, payload);
     })
   },

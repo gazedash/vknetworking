@@ -46,7 +46,7 @@
 <script>
   import {getUserName} from "../vk_api/index";
   import {isBottomOfPage} from "../utils/index";
-  import throttle from 'lodash/throttle';
+  import debounce from 'lodash/debounce';
   export default {
     name: 'search',
     data () {
@@ -88,11 +88,11 @@
     },
     created () {
       this.$store.dispatch('getCountries');
-      window.addEventListener('scroll', throttle(() => {
+      window.addEventListener('scroll', debounce(() => {
         if (isBottomOfPage()) {
           this.onSubmit();
         }
-      }, 500));
+      }, 335));
     },
     methods: {
         open (position) {
@@ -115,8 +115,15 @@
           this.close('top');
           let userId = getUserName(this.$data.profileLink);
            if (!Number.isInteger(userId)) {
-             this.$store.dispatch('getUser', userId).then((data) => self.finallyFetch(data.uid))
-           } else this.finallyFetch(userId);
+               let storedUserId = this.$store.state.aliases[userId];
+               if (storedUserId) {
+                   this.finallyFetch(storedUserId);
+               } else this.$store.dispatch('getUser', userId).then((data) => {
+                return self.finallyFetch(data.uid);
+             })
+           } else {
+             this.finallyFetch(userId);
+           }
         },
     },
   }
