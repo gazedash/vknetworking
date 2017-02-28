@@ -2,22 +2,27 @@
 //const api_key = "API_KEY";
 // https://api.vk.com/method/users.search?group_id=97408246&fields=photo_max,first_name,last_name&online=0&city=139&sex=0&has_photo=1&access_token=API_KEY
 import fetchJsonp from "fetch-jsonp";
-const api_key = "API_KEY";
+import _ from 'lodash';
+const api_key = localStorage.token || "API_KEY";
 const endpoint = "https://api.vk.com";
+const OAuthEndpoint = "https://oauth.vk.com/authorize?";
 
 function baseMethod(method) {
   return `${endpoint}/method/${method}?access_token=${api_key}`
 }
 
-export function buildGetMembersUrl({q, id, city = "", sex = 0, age_from = 0, age_to = 0, hometown = "", has_photo = 0}) {
+function paramsToString(params) {
+  let res = '&';
+  _.forEach(params, (value, key) => {
+    if (value || value === 0) res += `${key}=${value}&`;
+  });
+  return res;
+}
+
+export function buildGetMembersUrl(params) {
   // sex=1: female
-  return baseMethod('users.search') +
-    `${q ? "&q=" + q : ""}${hometown ? "&hometown=" + hometown : ""}&group_id=${id}` +
-    `&fields=photo_max,first_name,last_name&online=0` +
-    `${city ? "&city=" + city : ""}&sex=${sex ? sex : 0}` +
-    `${age_from ? "&age_from=" + age_from : ""}` +
-    `${age_to ? "&age_to=" + age_to : ""}` +
-    `&has_photo=${has_photo}&count=1000`;
+  console.log(baseMethod('users.search') + paramsToString(params) + '&count=1000&fields=photo_max,first_name,last_name&online=0');
+  return baseMethod('users.search') + paramsToString(params) + '&count=1000&fields=photo_max,first_name,last_name&online=0';
   // hometown?
 }
 
@@ -25,17 +30,23 @@ export function buildGetCountries() {
   return baseMethod('database.getCountries');
 }
 
-export function buildGetCities({country_id = 1, q = "", need_all = 0, count = 100}) {
-  return baseMethod('database.getCities') + `${q ? "&q=" + q : ""}&country_id=${country_id}` +
-    `&need_all=${need_all}&count=${count}`;
+export function buildGetCities(params) {
+  console.log(baseMethod('database.getCities') + paramsToString(params));
+  return baseMethod('database.getCities') + paramsToString(params);
 }
 
-export function buildGetSubscriptions(userId) {
-  return baseMethod('users.getSubscriptions') + `&user_id=${userId}&extended=0`;
+export function buildGetSubscriptions(params) {
+  console.log(baseMethod('users.getSubscriptions') + paramsToString(params) + '&extended=0');
+  return baseMethod('users.getSubscriptions') + paramsToString(params) + '&extended=0';
 }
 
-export function buildGetUser(id) {
-  return baseMethod('users.get') + `&user_ids=${id}`;
+export function buildGetUser(params) {
+  console.log(baseMethod('users.get') + paramsToString(params));
+  return baseMethod('users.get') + paramsToString(params);
+}
+
+export function buildVkAuthUrl({client_id, scope = "groups", redirect_uri, display = "page", v = "5.626", response_type = "token"}) {
+  return `${OAuthEndpoint}client_id=${client_id}&scope=${scope}&redirect_uri=${redirect_uri}&display=${display}&v=${v}&response_type=${response_type}`
 }
 
 export function getUserName(profileLink) {
@@ -44,8 +55,8 @@ export function getUserName(profileLink) {
   return id ? id : link ? link : profileLink;
 }
 
-export function fetchUser(id) {
-  return fetchJsonp(buildGetUser(id))
+export function fetchUser({user_ids}) {
+  return fetchJsonp(buildGetUser({user_ids}))
     .then(response => response.json())
     .then(json => {
       return json.response[0];
@@ -70,17 +81,19 @@ export function fetchCities({country_id = 1, q = "", need_all = 0, count = 100})
     });
 }
 
-export function fetchCommunities(userId) {
+export function fetchCommunities({user_id}) {
   // return Promise.resolve(
   //   JSON.parse("MOCK_DATA")
   // ).then(data => data);
-  return fetchJsonp(buildGetSubscriptions(userId))
+  return fetchJsonp(buildGetSubscriptions({user_id}))
   .then(response => response.json())
-  .then(json => json.response.groups.items);
+  .then(json => {
+    return json.response.groups.items;
+  });
 }
 
-export function fetchMembers({q, id, city, sex, age_from, age_to, hometown, has_photo}) {
-  return fetchJsonp(buildGetMembersUrl({q, id, city, sex, age_from, age_to, hometown, has_photo}))
+export function fetchMembers({q, group_id, city, sex = 0, age_from, age_to, hometown, has_photo}) {
+  return fetchJsonp(buildGetMembersUrl({q, group_id, city, sex, age_from, age_to, hometown, has_photo}))
     .then(response => response.json())
     .then(json => {
       if (json.response) {

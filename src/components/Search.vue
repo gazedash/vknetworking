@@ -1,13 +1,14 @@
 <template>
   <div>
-    <mu-appbar class="app-bar" title="VKNetworking" :zDepth="1">
-      <mu-icon-button slot="right" class="more" @click="open('top')">
+    <mu-appbar class="app-bar" :zDepth="1">
+      <router-link class="home" to="/">VKNetworking</router-link>
+      <mu-icon-button v-if="loggedIn" slot="right" class="more" @click="open('top')">
         <svg style="width:32px;height:32px" viewBox="0 0 24 24">
           <path fill="#000000" d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
         </svg>
       </mu-icon-button>
     </mu-appbar>
-    <mu-popup position="top" popupClass="popup" :open="topPopup" @close="close('top')">
+    <mu-popup v-if="loggedIn" position="top" popupClass="popup" :open="topPopup" @close="close('top')">
       <mu-paper class="paper" :zDepth="2" >
         <div class="profile-link">
           <mu-text-field hintText="enter id or link" label="Profile" v-model.trim="profileLink" />
@@ -47,10 +48,12 @@
   import {getUserName} from "../vk_api/index";
   import {isBottomOfPage} from "../utils/index";
   import debounce from 'lodash/debounce';
+  import {isLoggedIn} from "../utils/auth";
   export default {
     name: 'search',
     data () {
       return {
+        loggedIn: isLoggedIn(),
         sex: null,
         city: null,
         country: null,
@@ -129,6 +132,9 @@
   }
 </script>
 <style scoped>
+  .home {
+    color: #fff;
+  }
   .app-bar {
     position: fixed;
     top: 0;

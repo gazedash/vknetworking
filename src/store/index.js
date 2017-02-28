@@ -32,8 +32,8 @@ const mutations = {
   fetchedCommunitiesLength (state) {
     state.fetchedCommunitiesLength++;
   },
-  getCommunityIdList (state, {items, userId}) {
-    state.communityIdList[userId] = uniq(items.concat(state.communityIdList[userId]));
+  getCommunityIdList (state, {items, user_id}) {
+    state.communityIdList[user_id] = uniq(items.concat(state.communityIdList[user_id]));
   },
   getProfilesFromCommunity (state, {items}) {
     state.profileList = uniqBy(state.profileList.concat(items), 'uid');
@@ -58,13 +58,13 @@ const mutations = {
 // asynchronous operations.
 const actions = {
   setIndex: ({ commit }, index) => commit('setIndex', index),
-  getUser ({ commit }, uid) {
-    return fetchUser(uid)
+  getUser ({ commit }, user_ids) {
+    return fetchUser({user_ids})
       .then((items) => {
-        items.screen_name = uid;
+        items.screen_name = user_ids;
         commit('getUser', {items});
         if (items && items.uid) {
-          commit('bindAlisToUserId', {alias: uid, userId: items.uid});
+          commit('bindAlisToUserId', {alias: user_ids, userId: items.uid});
         }
         return items;
       });
@@ -83,10 +83,10 @@ const actions = {
         return items;
       });
   },
-  getCommunityIdList ({ commit }, userId) {
-    return fetchCommunities(userId)
+  getCommunityIdList ({ commit }, user_id) {
+    return fetchCommunities({user_id})
       .then((items) => {
-        commit('getCommunityIdList', {items, userId});
+        commit('getCommunityIdList', {items, user_id});
         return items;
       });
   },
@@ -109,7 +109,7 @@ const actions = {
     // payload is options for profile searching
     items = items ? items : state.communityIdList[payload.userId];
     return dispatch('getProfilesFromCommunity', {
-      id: items[state.index], ...payload
+      group_id: items[state.index], ...payload
     }).then(items => {
       if (items) {
         console.log(state.index);

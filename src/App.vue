@@ -1,17 +1,26 @@
 <template>
-  <div id="app">
+  <div :class="{ blurBg: !loggedIn }" id="app">
     <search></search>
-    <div class="stats">Communities: {{ size }} Profiles: {{ list.length }}</div>
-    <person v-for="el in list" :profile="el"></person>
+    <div v-if="loggedIn">
+      <div class="stats">Communities: {{ size }} Profiles: {{ list.length }}</div>
+      <person v-for="el in list" :profile="el"></person>
+    </div>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
   import Person from './components/Person'
   import Search from './components/Search'
+  import {isLoggedIn} from "./utils/auth";
 
   export default {
     name: 'app',
+    data() {
+      return {
+        loggedIn: isLoggedIn(),
+      }
+    },
     computed: {
       list () {
         return this.$store.getters.getProfileList
@@ -34,6 +43,10 @@
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
+  }
+  .blurBg {
+    height: calc(100vh - 64px);
+    background-image: url("http://eskipaper.com/images/blur-background-1.jpg");
   }
   .stats {
     margin-top: 74px;

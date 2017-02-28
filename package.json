@@ -18,7 +18,8 @@
     "lodash": "^4.17.4",
     "muse-ui": "^2.0.0-rc.5",
     "vue": "^2.1.10",
-    "vuex": "^2.1.2"
+    "vuex": "^2.1.2",
+    "vue-router": "^2.2.0"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.2",
