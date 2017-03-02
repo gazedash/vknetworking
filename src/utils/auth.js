@@ -1,73 +1,54 @@
-export default {
-  login (email, pass, cb) {
-    cb = arguments[arguments.length - 1];
-    if (localStorage.token) {
-      if (cb) cb(true);
-      this.onChange(true);
-      return
-    }
-    pretendRequest(email, pass, (res) => {
-      if (res.authenticated) {
-        localStorage.token = res.token;
-        if (cb) cb(true)
-        this.onChange(true)
-      } else {
-        if (cb) cb(false)
-        this.onChange(false)
-      }
-    })
-  },
+export let user = {
+  authenticated: false,
+};
 
-  getToken () {
-    return localStorage.token;
-  },
+export function getToken () {
+  return localStorage.token;
+}
 
-  logout (to, from, next) {
-    delete localStorage.token;
-    this.onChange(false);
+export function logout (to, from, next) {
+  delete localStorage.token;
+  user.authenticated = false;
+  console.log('logout', user.authenticated);
+  next('/login')
+}
+
+export function redirected(to, from, next) {
+  if (to.hash) {
+    const userId = to.hash.split('user_id=')[1];
+    localStorage.setItem("lastLoginUserId", userId);
+    console.log(userId);
+    const token = to.hash.split('access_token=')[1].split("&")[0];
+    localStorage.setItem("token", token);
+    user.authenticated = true;
+  }
+  window.close();
+}
+
+export function ifLoggedIn(to, from, next) {
+  if (checkAuth()) {
     next('/')
-  },
-
-  onChange () {
-  },
-
-  redirected(to, from, next) {
-    if (to.hash) {
-      // const userId = to.hash.split('user_id=')[1];
-      const token = to.hash.split('access_token=')[1].split("&")[0];
-      localStorage.setItem("token", token);
-    }
-    window.close();
-  },
-
-  requireAuth (to, from, next) {
-    if (!isLoggedIn()) {
-      console.log(!isLoggedIn());
-      next({
-        path: '/login',
-        // query: {redirect: to.fullPath}
-      })
-    } else {
-      console.log('esle');
-      next()
-    }
-  },
+  } else {
+    console.log('to login');
+    next();
+  }
 }
 
-export function isLoggedIn() {
-  console.log('hui', localStorage.token);
-  return !!localStorage.token
+export function requireAuth (to, from, next) {
+  if (!checkAuth()) {
+    console.log(!checkAuth());
+    next({
+      path: '/login',
+      // query: {redirect: to.fullPath}
+    })
+  } else {
+    console.log('esle');
+    next()
+  }
 }
 
-function pretendRequest(email, pass, cb) {
-  setTimeout(() => {
-    if (email === 'joe@example.com' && pass === 'password1') {
-      cb({
-        authenticated: true,
-        token: Math.random().toString(36).substring(7)
-      })
-    } else {
-      cb({authenticated: false})
-    }
-  }, 0)
+export function checkAuth() {
+  let token = localStorage.getItem('token');
+  user.authenticated = !!token;
+  return !!token;
 }

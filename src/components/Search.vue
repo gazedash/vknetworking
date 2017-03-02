@@ -1,14 +1,23 @@
 <template>
   <div>
     <mu-appbar class="app-bar" :zDepth="1">
-      <router-link class="home" to="/">VKNetworking</router-link>
-      <mu-icon-button v-if="loggedIn" slot="right" class="more" @click="open('top')">
-        <svg style="width:32px;height:32px" viewBox="0 0 24 24">
-          <path fill="#000000" d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
-        </svg>
-      </mu-icon-button>
+        <div class="home">
+          <router-link to="/">VKNetworking</router-link>
+        </div>
+        <mu-icon-button v-if="user.authenticated" slot="left" class="more" @click="open('top')">
+          <svg style="width:32px;height:32px" viewBox="0 0 24 24">
+            <path fill="#ffffff" d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
+          </svg>
+        </mu-icon-button>
+        <router-link v-if="user.authenticated" slot="right" to="/logout">
+          <mu-icon-button class="logout">
+            <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+              <path fill="#ffffff" d="M14.08,15.59L16.67,13H7V11H16.67L14.08,8.41L15.5,7L20.5,12L15.5,17L14.08,15.59M19,3A2,2 0 0,1 21,5V9.67L19,7.67V5H5V19H19V16.33L21,14.33V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19Z" />
+            </svg>
+          </mu-icon-button>
+        </router-link>
     </mu-appbar>
-    <mu-popup v-if="loggedIn" position="top" popupClass="popup" :open="topPopup" @close="close('top')">
+    <mu-popup v-if="user.authenticated" position="top" popupClass="popup" :open="topPopup" @close="close('top')">
       <mu-paper class="paper" :zDepth="2" >
         <div class="profile-link">
           <mu-text-field hintText="enter id or link" label="Profile" v-model.trim="profileLink" />
@@ -48,19 +57,20 @@
   import {getUserName} from "../vk_api/index";
   import {isBottomOfPage} from "../utils/index";
   import debounce from 'lodash/debounce';
-  import {isLoggedIn} from "../utils/auth";
+  import {checkAuth} from "../utils/auth";
+  import {user} from "../utils/auth";
   export default {
     name: 'search',
     data () {
       return {
-        loggedIn: isLoggedIn(),
-        sex: null,
+        user,
+        sex: '1',
         city: null,
         country: null,
         profileLink: null,
         query: null,
         cities: [],
-        age_from: null,
+        age_from: 14,
         age_to: null,
         topPopup: true,
       }
@@ -82,9 +92,9 @@
       },
     },
     computed: {
-        countries () {
-          return this.$store.state.countries;
-        },
+      countries () {
+        return this.$store.state.countries;
+      },
     },
     beforeUpdate() {
         this.country = this.$store.state.countries[1].cid;
@@ -133,6 +143,9 @@
 </script>
 <style scoped>
   .home {
+    text-align: center;
+  }
+  .home > a {
     color: #fff;
   }
   .app-bar {
@@ -143,9 +156,6 @@
     padding: 0;
     width: 32px;
     height: 32px;
-  }
-  .more > div > svg > path {
-    fill: white;
   }
   .paper {
     padding: 14px 25px 14px 25px;

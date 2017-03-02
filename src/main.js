@@ -1,22 +1,25 @@
 import App from "./App";
+import Shell from "./Shell";
 import Login from "./components/Login";
 import Vue from "vue";
 import store from './store'
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
 import VueRouter from 'vue-router'
-import auth from './utils/auth'
+import {redirected, logout, ifLoggedIn, requireAuth, checkAuth} from './utils/auth'
 
 Vue.use(MuseUI);
 Vue.use(VueRouter);
 
+checkAuth();
+
 const router = new VueRouter({
   mode: 'history',
   routes: [
-    { path: '/', component: App, beforeEnter: auth.requireAuth },
-    { path: '/login', component: Login },
-    { path: '/auth', beforeEnter: auth.redirected },
-    { path: '/logout', beforeEnter: auth.logout }
+    { path: '/', component: Shell, beforeEnter: requireAuth },
+    { path: '/login', component: Login, beforeEnter: ifLoggedIn },
+    { path: '/auth', beforeEnter: redirected },
+    { path: '/logout', beforeEnter: logout }
   ]
 });
 /* eslint-disable no-new */
