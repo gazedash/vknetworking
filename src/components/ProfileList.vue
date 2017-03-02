@@ -2,10 +2,10 @@
   <div>
     <mu-paper class="paper" :zDepth="1">
       <div class="list">
-        <person v-for="el in items.list" :profile="el"></person>
+        <person v-for="el in list" :profile="el"></person>
       </div>
     </mu-paper>
-    <div class="stats">Communities: {{ items.size }} Profiles: {{ items.list.length }}</div>
+    <div class="stats">Communities: {{ size }} Profiles: {{ list.length }}</div>
   </div>
 </template>
 
@@ -16,25 +16,34 @@
   import debounce from 'lodash/debounce';
   export default {
     name: 'profile-list',
-    props: ['items'],
+    props: ['list', 'size'],
     components: {
       Person,
     },
     methods: {
-      fetchIfNoScroll: debounce(
-        function (user) {
-          if (isContentSmallerThanWindow() && user) {
-            this.$store.dispatch('getNext', user)
+      fetchNew: debounce(
+        function () {
+          const {currentUser} = this.$store.state;
+          if (currentUser) {
+            this.$store.dispatch('getNext', currentUser)
           }
         }, 400),
     },
-    watch: {
-      items(s, oldS) {
-        console.log('WATCH SIZE', s, oldS, this.items);
-
-        const {currentUser} = this.$store.state;
-        this.fetchIfNoScroll(currentUser);
+    computed: {
+      items() {
+        return {
+          length: this.list.length,
+          size: this.size,
+        }
       }
+    },
+    watch: {
+      items(items, oldItems) {
+        const noNewProfiles = items.length === oldItems.length && items.size !== oldItems.size;
+        if (isContentSmallerThanWindow() || !isContentSmallerThanWindow() && noNewProfiles) {
+            this.fetchNew();
+        }
+      },
     }
   }
 </script>

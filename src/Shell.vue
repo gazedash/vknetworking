@@ -1,6 +1,6 @@
 <template>
   <div id="shell">
-    <profile-list v-if="user.authenticated" :items="items"></profile-list>
+    <profile-list v-if="user.authenticated" :size="size" :list="list"></profile-list>
   </div>
 </template>
 
@@ -17,12 +17,6 @@
       }
     },
     computed: {
-      items () {
-        return {
-          list: this.list,
-          size: this.size,
-        }
-      },
       list () {
         return this.$store.getters.getProfileList
       },
