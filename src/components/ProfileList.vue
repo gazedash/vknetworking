@@ -11,7 +11,7 @@
 
 <script>
   import Person from './Person'
-  import {isContentSmallerThanWindow} from "../utils/index";
+  import {isContentSmallerThanWindow, isBottomOfPage} from "../utils/index";
   import Vue from 'vue';
   import debounce from 'lodash/debounce';
   export default {
@@ -34,13 +34,18 @@
         return {
           length: this.list.length,
           size: this.size,
+          pageLength: document.documentElement.scrollHeight,
         }
-      }
+      },
     },
     watch: {
       items(items, oldItems) {
-        const noNewProfiles = items.length === oldItems.length && items.size !== oldItems.size;
-        if (isContentSmallerThanWindow() || !isContentSmallerThanWindow() && noNewProfiles) {
+        const diff = items.length - oldItems.length;
+        const screenSizeIsNotChanged = items.pageLength === oldItems.pageLength;
+        const notEnoughNewProfiles = isBottomOfPage() && (screenSizeIsNotChanged || diff < 5);
+//        const noNewProfiles = items.length === oldItems.length && items.size !== oldItems.size;
+        if (notEnoughNewProfiles) {
+//        if (isContentSmallerThanWindow() && noNewProfiles) {
             this.fetchNew();
         }
       },

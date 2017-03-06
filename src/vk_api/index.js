@@ -107,7 +107,7 @@ export function fetchCommunities({user_id}) {
 
 function logError(json) {
   if (json.error) {
-    console.log(json);
+    console.error(json);
   }
 }
 
@@ -118,6 +118,9 @@ export function fetchMembers({q, group_id, city, sex = 0, age_from, age_to, home
       logError(json);
       if (json.response) {
         json.response.shift()
+      }
+      if (json.error && !json.response) {
+        json.response = [];
       }
       return json.response;
     });

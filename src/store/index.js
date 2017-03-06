@@ -87,7 +87,6 @@ const actions = {
       })
     }
   },
-  setIndex: ({commit, dispatch}, index) => commit('setIndex', index),
   getUser ({commit, dispatch}, user_ids) {
     return fetchUser({user_ids})
       .then((items) => {
@@ -158,8 +157,10 @@ const actions = {
         console.log(state.index);
         return commit('getNext', {items});
       }
-      // in case if there are no items:
-      // actions.getNext({commit, state}, payload);
+      if (items.length < 5 || !items) {
+        // in case if there are few or no items:
+        actions.getNext({commit, state}, payload);
+      }
     })
   },
 };
