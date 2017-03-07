@@ -1,10 +1,14 @@
 <template>
   <div class="bg">
+    <app-header></app-header>
     <div class="login">
       <mu-paper class="paper" :zDepth="1">
+        <div class="hello">Hello!</div>
+        <div class="text">
+          This service is created to help you find new friends!
+        </div>
         <div class="form">
           <label>
-            <span class="hello">Hello!</span>
             <span>Please log in<br/> to continue</span>
           </label>
           <mu-raised-button class="login-button" backgroundColor="#507299" @click="login" type="submit">
@@ -26,7 +30,12 @@
   import {checkAuth} from '../utils/auth'
   import {windowClosedPromise, createSignInPopup} from "../utils/index";
   import {LOGIN_ERROR} from "../const/index";
+  import AppHeader from "./AppHeader";
+
   export default {
+    components: {
+      AppHeader,
+    },
     data () {
       return {
         error: false
@@ -49,7 +58,7 @@
 <style scoped>
   .bg {
     height: calc(100vh - 64px);
-    background-image: url("http://eskipaper.com/images/blur-background-1.jpg");
+    background-image: url("../assets/background.svg");
   }
 
   .login {
@@ -65,7 +74,7 @@
 
   .login-button-content {
     display: flex;
-    justify-content: space-around;
+    /*justify-content: space-around;*/
   }
 
   .login-title {
@@ -73,27 +82,32 @@
   }
 
   .paper {
-    padding: 20px;
-    margin-top: 30px;
-    margin-bottom: 30px;
+    padding: 18px 25px 18px 25px;
+    margin: 30px 0;
   }
 
   .form {
+    padding-top: 5px;
     display: flex;
+    justify-content: space-around;
     flex-direction: row;
   }
 
   .form > label {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin-right: 20px;
+    /*display: flex;*/
+    /*flex-direction: column;*/
+    /*justify-content: center;*/
     font-size: 18px;
   }
 
   .hello {
-    font-size: 21px;
+    font-size: 22px;
     text-align: center;
+    padding-bottom: 5px;
+  }
+
+  .text {
+    font-size: 16px;
   }
 
   .error {

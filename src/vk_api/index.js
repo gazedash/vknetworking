@@ -8,13 +8,14 @@ export const client_id = 5899859;
 // https://api.vk.com/method/users.search?group_id=97408246&fields=photo_max,first_name,last_name&online=0&city=139&sex=0&has_photo=1&access_token=API_KEY
 import fetchJsonp from "fetch-jsonp";
 import _ from 'lodash';
-const api_key = localStorage.token;
+
+function api_key() { return localStorage.token; };
 const endpoint = "https://api.vk.com";
 const OAuthEndpoint = "https://oauth.vk.com/authorize?";
 export const redirect_uri = "https://vknetworking-8c4dd.firebaseapp.com/auth";
 
 function baseMethod(method) {
-  return `${endpoint}/method/${method}?access_token=${api_key}`
+  return `${endpoint}/method/${method}?access_token=${api_key()}`
 }
 
 function paramsToString(params) {
@@ -46,6 +47,11 @@ export function buildGetSubscriptions(params) {
   return baseMethod('users.getSubscriptions') + paramsToString(params) + '&extended=0';
 }
 
+export function buildGetCountriesByCode(params) {
+  console.log(baseMethod('database.getCountries') + paramsToString(params));
+  return baseMethod('database.getCountries') + paramsToString(params);
+}
+
 export function buildGetUser(params) {
   console.log(baseMethod('users.get') + paramsToString(params));
   return baseMethod('users.get') + paramsToString(params);
@@ -71,6 +77,19 @@ export function fetchUser({user_ids}) {
       logError(json);
       return json.response[0];
     });
+}
+
+export function fetchCountriesByCode({code}) {
+  return fetchJsonp(buildGetCountriesByCode({code}))
+    .then(response => response.json())
+    .then(json => {
+      logError(json);
+      if (json.response) {
+        return json.response;
+      } else {
+        return json;
+      }
+    })
 }
 
 export function fetchCountries() {
@@ -111,17 +130,17 @@ function logError(json) {
   }
 }
 
-export function fetchMembers({q, group_id, city, sex = 0, age_from, age_to, hometown, has_photo}) {
-  return fetchJsonp(buildGetMembersUrl({q, group_id, city, sex, age_from, age_to, hometown, has_photo}))
+export function fetchMembers({q, group_id, country, city, sex = 0, age_from, age_to, hometown, has_photo}) {
+  return fetchJsonp(buildGetMembersUrl({q, country, group_id, city, sex, age_from, age_to, hometown, has_photo}))
     .then(response => response.json())
     .then(json => {
       logError(json);
       if (json.response) {
         json.response.shift()
       }
-      if (json.error && !json.response) {
-        json.response = [];
-      }
+      // if (json.error && !json.response) {
+      //   json.response = [];
+      // }
       return json.response;
     });
 }

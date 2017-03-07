@@ -23,14 +23,16 @@
         msg: 'Welcome to Your Vue.js App'
       }
     },
+    created() {
+      if (this.profile && !this.profile.photo_max) {
+          console.log('no photo?', this.profile);
+      }
+    },
     methods: {
       mouseOver(id) {
-        console.log(this.activeId, id);
         this.activeId = id;
-        console.log(this.activeId);
       },
       mouseLeave() {
-        console.log('mouseout');
         this.activeId = null;
       }
     }

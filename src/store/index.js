@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import {fetchCommunities, fetchMembers, fetchCountries, fetchCities, fetchUser} from "../vk_api/index";
+import {fetchCommunities, fetchMembers, fetchCountries, fetchCities, fetchUser, fetchCountriesByCode} from "../vk_api/index";
 import uniqBy from "lodash/uniqBy";
 import {uniq} from "lodash";
 
@@ -52,9 +52,9 @@ const mutations = {
   getUser (state, {items}) {
     state.users[items.uid] = items;
   },
-  getCountries (state, {items}) {
+  getCountries (state, {items, payload}) {
     const countries = Object.assign({}, state.countries);
-    if (items) items.forEach((country) => countries[country.cid] = country);
+    if (items) items.forEach((country) => countries[country.cid] = {payload, ...country});
     state.countries = countries;
   },
   getCities (state, {items, country_id}) {
@@ -112,19 +112,19 @@ const actions = {
   getCities ({commit, dispatch}, payload) {
     return fetchCities(payload)
       .then((items) => {
-          return dispatch('incrCheckAndWait').then(() => {
-            commit('getCities', {items, country_id: payload.country_id});
-            return items;
-          });
+        return dispatch('incrCheckAndWait').then(() => {
+          commit('getCities', {items, country_id: payload.country_id});
+          return items;
+        });
       });
   },
   getCommunityIdList ({commit, dispatch}, user_id) {
     return fetchCommunities({user_id})
       .then((items) => {
-          return dispatch('incrCheckAndWait').then(() => {
-            commit('getCommunityIdList', {items, user_id});
-            return items;
-          });
+        return dispatch('incrCheckAndWait').then(() => {
+          commit('getCommunityIdList', {items, user_id});
+          return items;
+        });
       });
   },
   getProfilesFromCommunity ({commit, dispatch}, payload) {
@@ -135,6 +135,15 @@ const actions = {
           commit('getProfilesFromCommunity', {items});
           return items;
         });
+      });
+  },
+  getCountriesByCode ({dispatch, commit}, payload) {
+    return fetchCountriesByCode(payload)
+      .then(items => {
+          return dispatch('incrCheckAndWait').then(() => {
+            commit('getCountries', {items, payload});
+            return items;
+          });
       });
   },
   getNextNext ({dispatch, commit, state}, payload) {
@@ -150,25 +159,28 @@ const actions = {
     commit('setCurrentUser', payload);
     return dispatch('getProfilesFromCommunity', {
       group_id: items[state.index], ...payload
-    }).then(items => {
-      if (items) {
+    }).then(profiles => {
+      if (profiles) {
         console.log(state.index);
-        commit('setIndex', state.index + 1);
+        const nextIndex = state.index + 1;
+        if (nextIndex < items.length) {
+          commit('setIndex', nextIndex);
+        }
         console.log(state.index);
-        return commit('getNext', {items});
-      }
-      if (items.length < 5 || !items) {
-        // in case if there are few or no items:
-        actions.getNext({commit, state}, payload);
+        return commit('getNext', {items: profiles});
       }
     })
   },
 };
 
 // getters are functions
-const getters = {
+export const getters = {
   getStateIndex: state => state.index,
+  getCurrentCities: state => (country_id) => state.cities[country_id],
   getProfileList: state => state.profileList,
+  getStoredUserId: state => (userId) => state.aliases[userId],
+  getCurrentUserCommunities: state => state.communityIdList[state.currentUser.userId],
+  getUserCommunities: state => (userId) => state.communityIdList[userId],
   getCurrentCommunityId: state => state.communityIdList[state.index],
   getNextCommunityId: state => state.communityIdList[state.index + 1],
 };

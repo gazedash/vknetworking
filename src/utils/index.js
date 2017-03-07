@@ -1,5 +1,6 @@
 import {SING_IN_VK_TITLE} from "../const/index";
 import {redirect_uri, client_id, buildVkAuthUrl} from "../vk_api/index";
+
 export function isBottomOfPage() {
   return (window.innerHeight + window.scrollY) >= document.body.scrollHeight;
 }
@@ -38,5 +39,5 @@ export function createSignInPopup() {
   return createPopup(buildVkAuthUrl({
     client_id,
     redirect_uri,
-  }), SING_IN_VK_TITLE);
+  }), SING_IN_VK_TITLE, {});
 }

@@ -1,17 +1,17 @@
 import App from "./App";
-import Shell from "./Shell";
+import Shell from "./containers/Shell";
 import Login from "./components/Login";
 import Vue from "vue";
 import store from './store'
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
 import VueRouter from 'vue-router'
-import {redirected, logout, ifLoggedIn, requireAuth, checkAuth} from './utils/auth'
+import {redirected, logout, ifLoggedIn, requireAuth, initialCheck} from './utils/auth'
 
 Vue.use(MuseUI);
 Vue.use(VueRouter);
 
-checkAuth();
+initialCheck();
 
 const router = new VueRouter({
   mode: 'history',

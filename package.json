@@ -14,12 +14,13 @@
   "dependencies": {
     "es6-promise": "^4.0.5",
     "fetch-jsonp": "^1.0.6",
+    "i18n-iso-countries": "^1.10.0",
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.4",
     "muse-ui": "^2.0.0-rc.5",
     "vue": "^2.1.10",
-    "vuex": "^2.1.2",
-    "vue-router": "^2.2.0"
+    "vue-router": "^2.2.0",
+    "vuex": "^2.1.2"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.2",
