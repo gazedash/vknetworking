@@ -12,7 +12,7 @@ const state = {
   profileList: [],
   communityIdList: {},
   countries: {NaN: {cid: NaN, title: 'Not specified'}},
-  cities: {NaN: [{cid: NaN, title: 'Not specified'}]},
+  cities: {NaN: [{cid: NaN, label: 'Not specified'}]},
   aliases: {},
   users: {},
   currentUser: {},
@@ -58,7 +58,13 @@ const mutations = {
     state.countries = countries;
   },
   getCities (state, {items, country_id}) {
-    state.cities[country_id] = [...items, {cid: NaN, title: 'Not specified'}];
+    const stateCities = state.cities[country_id] ? state.cities[country_id] : [];
+    stateCities.push({cid: NaN, label: 'Not specified'});
+    items = items.map((city) => {
+      city.label = city.area ? `${city.title} (${city.area})` : city.title;
+      return city;
+    });
+    state.cities[country_id] = uniqBy(items.concat(stateCities), 'cid');
   },
   getNext (state, {items}) {
     mutations.getProfilesFromCommunity(state, {items});

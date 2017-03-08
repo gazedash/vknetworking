@@ -9,13 +9,15 @@
         <mu-text-field hintText="enter search query" label="Search query" v-model.trim="query"/>
       </div>
       <div class="country">
-        <mu-auto-complete v-model="countryInput" :dataSource="countriesArr" :dataSourceConfig="dataSourceConfig"
+        <mu-auto-complete openOnFocus :filter="filterSource" v-model="countryInput" :dataSource="countriesArr" :dataSourceConfig="dataSourceConfigCountry"
                           @blur="blur" @select="handlechange"></mu-auto-complete>
       </div>
       <div class="city">
-        <mu-select-field v-model="city" :labelFocusClass="['label-focus']" label="City">
-          <mu-menu-item v-for="city in cities" ccc="dddd" ttt="ddd" :value="city.cid" :title="city.title"/>
-        </mu-select-field>
+        <mu-auto-complete openOnFocus :filter="filterSource" v-model="cityInput" :dataSource="cityArr" :dataSourceConfig="dataSourceConfigCity"
+                          @blur="blurCity" @select="handlechangeCity"></mu-auto-complete>
+        <!--<mu-select-field v-model="city" :labelFocusClass="['label-focus']" label="City">-->
+          <!--<mu-menu-item v-for="city in cities" ccc="dddd" ttt="ddd" :value="city.cid" :title="city.title"/>-->
+        <!--</mu-select-field>-->
       </div>
       <div class="sex">
         <mu-radio label="Male" name="group" nativeValue="2" v-model="sex" class="sex-radio"/>
@@ -38,25 +40,34 @@
   import Welcome from './Welcome';
   import {user, setDoNotShowAgain} from '../utils/auth';
   import _ from 'lodash';
+  import uniq from 'lodash/uniq';
   import countries from "i18n-iso-countries";
   export default {
     name: 'search-popup',
     data () {
       return {
-        dataSourceConfig: {text: 'title', value: 'cid'},
+        dataSourceConfigCountry: {text: 'title', value: 'cid'},
+        dataSourceConfigCity: {text: 'label', value: 'cid'},
         user,
         sex: '1',
         city: null,
+        cityInput: null,
         country: null,
         countryInput: 'Russia',
         profileLink: null,
         query: null,
         age_from: null,
         age_to: null,
+        filterSource (searchText, key) {
+          return key.includes(searchText);
+        },
       }
     },
     props: ['open', 'close', 'onSubmit', 'cities', 'countries'],
     computed: {
+      cityArr() {
+        return _.toArray(this.cities);
+      },
       countriesArr() {
         return _.toArray(this.countries);
       },
@@ -74,22 +85,23 @@
     },
     watch: {
       countries(items) {
-        if (items) {
-          this.country = items[1].cid;
-        }
-        console.log({before: this.country});
+        this.country = items[1].cid;
         const currentCountry = _.find(this.countries, (country) => country.title === this.countryInput);
         if (currentCountry) {
           this.country = currentCountry.cid;
-          console.log({after: this.country});
         }
       },
       country (cid) {
+        // does this even change anything
         this.country = cid;
         this.$emit('changeCountry', cid);
       },
       cities (cities) {
         this.city = cities[0].cid;
+        const currentCity = _.find(this.cities, (city) => city.title === this.cityInput);
+        if (currentCity) {
+            this.city = currentCity.cid;
+        }
       },
     },
     methods: {
@@ -103,13 +115,24 @@
           this.$emit('getCountryByCode', {code, country});
         }
       },
+      blurCity (e) {
+        const city = e.target.value;
+        const c = _.find(this.cities, (el) => el.title === city);
+        if (c) {
+            this.city = c.cid;
+        } else {
+          const country = this.countryInput || this.country;
+          const code = countries.getAlpha2Code(country, 'en');
+          this.$emit('getCityByQuery', {city, code, country: this.country, countryInput: this.countryInput});
+        }
+      },
       handlechange (country) {
-        console.log(country);
         this.country = country.cid;
-//          this.country = _.find(this.countries, (el) => el.title === val);
+      },
+      handlechangeCity (city) {
+        this.city = city.cid;
       },
       onSubmitLocal() {
-        console.log(this.searchData);
         this.onSubmit(this.searchData);
       },
       doNotShowAgain() {
@@ -120,7 +143,7 @@
   }
 </script>
 
-<style scoped>
+<style>
   .paper {
     padding: 14px 25px 14px 25px;
   }

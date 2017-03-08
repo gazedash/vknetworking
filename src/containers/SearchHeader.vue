@@ -6,6 +6,7 @@
       <search-popup
         v-on:changeCountry="changeCities"
         v-on:getCountryByCode="getCountryByCode"
+        v-on:getCityByQuery="getCityByQuery"
         :close="close"
         :cities="cities"
         :countries="countries"
@@ -25,6 +26,7 @@
   import SearchPopup from '../components/SearchPopup';
   import {isBottomOfPage} from "../utils/index";
   import debounce from 'lodash/debounce';
+  import _ from 'lodash';
   import {checkAuth} from "../utils/auth";
   export default {
     name: 'search',
@@ -57,13 +59,28 @@
         } else {
           this.$store.dispatch('getCities', {country_id})
             .then(() => {
-              const currentCities = this.$store.getters.getCurrentCities(country_id);
-              this.cities = currentCities;
+              this.cities = this.$store.getters.getCurrentCities(country_id);
             });
         }
       },
       getCountryByCode ({code, country}) {
           this.$store.dispatch('getCountriesByCode', {code, country});
+      },
+      getCityByQuery ({city, code, country, countryInput}) {
+          if (Number.isInteger(country)) {
+            this.$store.dispatch('getCities', {q: city, code, country_id: country, countryInput})
+              .then(() => {
+                this.cities = this.$store.getters.getCurrentCities(country);
+              });
+          } else {
+            this.$store.dispatch('getCountriesByCode', {code, country})
+              .then(items => {
+                this.$store.dispatch('getCities', {q: city, code, country_id: items[0].cid})
+                  .then(() => {
+                    this.cities = this.$store.getters.getCurrentCities(country);
+                  });
+              });
+          }
       },
       open (position) {
         this[position + 'Popup'] = true
@@ -72,7 +89,6 @@
         this[position + 'Popup'] = false
       },
       finallyFetch({query: q, ...data}) {
-        console.log(data);
         const payload = {...data, q};
         if (this.$store.getters.getUserCommunities(data.userId)) {
           this.$store.dispatch('getNext', payload);
