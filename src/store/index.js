@@ -2,7 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import {fetchCommunities, fetchMembers, fetchCountries, fetchCities, fetchUser, fetchCountriesByCode} from "../vk_api/index";
 import uniqBy from "lodash/uniqBy";
-import {uniq} from "lodash";
+import uniq from "lodash/uniq";
 
 Vue.use(Vuex);
 
@@ -162,20 +162,18 @@ const actions = {
   getNext ({dispatch, commit, state}, {items, ...payload}) {
     // payload is options for profile searching
     items = items ? items : state.communityIdList[payload.userId];
-    commit('setCurrentUser', payload);
-    return dispatch('getProfilesFromCommunity', {
-      group_id: items[state.index], ...payload
-    }).then(profiles => {
-      if (profiles) {
-        console.log(state.index);
-        const nextIndex = state.index + 1;
-        if (nextIndex < items.length) {
-          commit('setIndex', nextIndex);
+    const nextIndex = state.index + 1;
+    if (nextIndex < items.length) {
+      commit('setIndex', nextIndex);
+      commit('setCurrentUser', payload);
+      return dispatch('getProfilesFromCommunity', {
+        group_id: items[state.index], ...payload
+      }).then(profiles => {
+        if (profiles) {
+          return commit('getNext', {items: profiles});
         }
-        console.log(state.index);
-        return commit('getNext', {items: profiles});
-      }
-    })
+      })
+    }
   },
 };
 
@@ -187,8 +185,6 @@ export const getters = {
   getStoredUserId: state => (userId) => state.aliases[userId],
   getCurrentUserCommunities: state => state.communityIdList[state.currentUser.userId],
   getUserCommunities: state => (userId) => state.communityIdList[userId],
-  getCurrentCommunityId: state => state.communityIdList[state.index],
-  getNextCommunityId: state => state.communityIdList[state.index + 1],
 };
 
 // A Vuex instance is created by combining the state, mutations, actions,

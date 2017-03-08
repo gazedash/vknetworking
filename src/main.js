@@ -7,9 +7,15 @@ import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
 import VueRouter from 'vue-router'
 import {redirected, logout, ifLoggedIn, requireAuth, initialCheck} from './utils/auth'
+import lazy from './directives/lazy';
 
 Vue.use(MuseUI);
 Vue.use(VueRouter);
+
+Vue.directive(
+  'lazy',
+  lazy
+);
 
 initialCheck();
 

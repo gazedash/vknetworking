@@ -75,7 +75,10 @@ export function fetchUser({user_ids}) {
     .then(response => response.json())
     .then(json => {
       logError(json);
-      return json.response[0];
+      if (json.response) {
+        return json.response[0];
+      }
+      return [];
     });
 }
 
@@ -86,9 +89,8 @@ export function fetchCountriesByCode({code}) {
       logError(json);
       if (json.response) {
         return json.response;
-      } else {
-        return json;
       }
+      return [];
     })
 }
 
@@ -99,7 +101,10 @@ export function fetchCountries() {
     })
     .then(json => {
       logError(json);
-      return json.response;
+      if (json.response) {
+        return json.response;
+      }
+      return [];
     });
 }
 
@@ -108,7 +113,10 @@ export function fetchCities({country_id = 1, q = "", need_all = 0, count = 100})
     .then(response => response.json())
     .then(json => {
       logError(json);
-      return json.response;
+      if (json.response) {
+        return json.response;
+      }
+      return [];
     });
 }
 
@@ -120,7 +128,11 @@ export function fetchCommunities({user_id}) {
   .then(response => response.json())
   .then(json => {
     logError(json);
-    return json.response.groups.items;
+    if (json.response) {
+      const res = json.response.groups.items;
+      return res ? res : [];
+    }
+    return [];
   });
 }
 
@@ -136,11 +148,9 @@ export function fetchMembers({q, group_id, country, city, sex = 0, age_from, age
     .then(json => {
       logError(json);
       if (json.response) {
-        json.response.shift()
+        json.response.shift();
+        return json.response;
       }
-      // if (json.error && !json.response) {
-      //   json.response = [];
-      // }
-      return json.response;
+      return [];
     });
 }

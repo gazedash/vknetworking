@@ -3,7 +3,7 @@
     <div>
       <a v-on:mouseenter="mouseOver(profile.uid)" v-on:mouseleave="mouseLeave" :href="'https://vk.com/id' + profile.uid" target="_blank">
         <div class="image">
-          <img :src="profile.photo_max"/>
+          <img v-lazy="profile.photo_max"/>
           <div v-if="activeId === profile.uid" class="name">
             {{ profile.first_name }} {{ profile.last_name }}
           </div>

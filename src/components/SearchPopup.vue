@@ -93,11 +93,11 @@
       },
       country (cid) {
         // does this even change anything
-        this.country = cid;
         this.$emit('changeCountry', cid);
       },
       cities (cities) {
         this.city = cities[0].cid;
+        this.cityInput = cities[0].label;
         const currentCity = _.find(this.cities, (city) => city.title === this.cityInput);
         if (currentCity) {
             this.city = currentCity.cid;
