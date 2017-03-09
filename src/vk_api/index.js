@@ -104,8 +104,12 @@ export function fetchCountries() {
       if (json.response) {
         return json.response;
       }
-      return [];
+      return _.toArray(json);
     });
+}
+
+export function checkAuthError(array) {
+  return array[0].error_code === 5;
 }
 
 export function fetchCities({country_id = 1, q = "", need_all = 0, count = 100}) {

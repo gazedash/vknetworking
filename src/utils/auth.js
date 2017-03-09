@@ -10,7 +10,6 @@ export function getToken () {
 export function logout (to, from, next) {
   delete localStorage.token;
   user.authenticated = false;
-  console.log('logout', user.authenticated);
   next('/login')
 }
 

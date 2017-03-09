@@ -9,14 +9,16 @@
         <mu-text-field hintText="enter search query" label="Search query" v-model.trim="query"/>
       </div>
       <div class="country">
-        <mu-auto-complete openOnFocus :filter="filterSource" v-model="countryInput" :dataSource="countriesArr" :dataSourceConfig="dataSourceConfigCountry"
+        <mu-auto-complete openOnFocus :filter="filterSource" v-model="countryInput" :dataSource="countriesArr"
+                          :dataSourceConfig="dataSourceConfigCountry"
                           @blur="blur" @select="handlechange"></mu-auto-complete>
       </div>
       <div class="city">
-        <mu-auto-complete openOnFocus :filter="filterSource" v-model="cityInput" :dataSource="cityArr" :dataSourceConfig="dataSourceConfigCity"
+        <mu-auto-complete openOnFocus :filter="filterSource" v-model="cityInput" :dataSource="cityArr"
+                          :dataSourceConfig="dataSourceConfigCity"
                           @blur="blurCity" @select="handlechangeCity"></mu-auto-complete>
         <!--<mu-select-field v-model="city" :labelFocusClass="['label-focus']" label="City">-->
-          <!--<mu-menu-item v-for="city in cities" ccc="dddd" ttt="ddd" :value="city.cid" :title="city.title"/>-->
+        <!--<mu-menu-item v-for="city in cities" ccc="dddd" ttt="ddd" :value="city.cid" :title="city.title"/>-->
         <!--</mu-select-field>-->
       </div>
       <div class="sex">
@@ -63,7 +65,26 @@
         },
       }
     },
-    props: ['open', 'close', 'onSubmit', 'cities', 'countries'],
+    props: {
+      open: {
+          type: Boolean,
+          default: true,
+      },
+      close: {
+          type: Function,
+      },
+      onSubmit: {
+        type: Function,
+      },
+      cities: {
+          type: Array,
+          default: [],
+      },
+      countries: {
+          type: Object,
+          default: {},
+      }
+    },
     computed: {
       cityArr() {
         return _.toArray(this.cities);
@@ -85,7 +106,7 @@
     },
     watch: {
       countries(items) {
-        this.country = items[1].cid;
+        this.country = items[1] ? items[1].cid : 1;
         const currentCountry = _.find(this.countries, (country) => country.title === this.countryInput);
         if (currentCountry) {
           this.country = currentCountry.cid;
@@ -100,7 +121,7 @@
         this.cityInput = cities[0].label;
         const currentCity = _.find(this.cities, (city) => city.title === this.cityInput);
         if (currentCity) {
-            this.city = currentCity.cid;
+          this.city = currentCity.cid;
         }
       },
     },
@@ -119,7 +140,7 @@
         const city = e.target.value;
         const c = _.find(this.cities, (el) => el.title === city);
         if (c) {
-            this.city = c.cid;
+          this.city = c.cid;
         } else {
           const country = this.countryInput || this.country;
           const code = countries.getAlpha2Code(country, 'en');

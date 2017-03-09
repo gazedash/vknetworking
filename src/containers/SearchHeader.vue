@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import {getUserName} from "../vk_api/index";
+  import {getUserName, checkAuthError} from "../vk_api/index";
   import AppHeader from '../components/AppHeader';
   import Logout from '../components/Logout';
   import SearchButton from '../components/SearchButton';
@@ -44,7 +44,11 @@
       },
     },
     created () {
-      this.$store.dispatch('getCountries');
+      this.$store.dispatch('getCountries').then((res) => {
+          if (checkAuthError(res)) {
+            this.$router.push('/logout');
+          }
+      });
       window.addEventListener('scroll', debounce(() => {
         if (isBottomOfPage()) {
           this.onSubmit();
