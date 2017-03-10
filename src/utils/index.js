@@ -6,12 +6,12 @@ export function isBottomOfPage() {
 }
 
 export function isContentSmallerThanWindow() {
-  //            Browser window height
-  //            window.innerHeight
-  //            954
-  //            Content height
-  //            document.documentElement.scrollHeight
-  //            2594
+             // Browser window height:
+             // window.innerHeight
+             // 954
+             // Content page height:
+             // document.documentElement.scrollHeight
+             // 2594
   return window.innerHeight >= document.documentElement.scrollHeight;
 }
 

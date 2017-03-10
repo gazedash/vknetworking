@@ -1,16 +1,18 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import {fetchCommunities, fetchMembers, fetchCountries, fetchCities, fetchUser, fetchCountriesByCode} from "../vk_api/index";
+import {fetchGroups, fetchMembers, fetchCountries, fetchCities, fetchUser, fetchCountriesByCode} from "../vk_api/index";
 import uniqBy from "lodash/uniqBy";
 import uniq from "lodash/uniq";
+import * as mt from "./mutationTypes";
+import * as at from "./actionTypes";
 
 Vue.use(Vuex);
 
 const state = {
-  index: 0,
-  fetchedCommunitiesLength: 0,
+  index: {},
+  fetchedGroupsLength: 0,
   profileList: [],
-  communityIdList: {},
+  groupIdList: {},
   countries: {NaN: {cid: NaN, title: 'Not specified'}},
   cities: {NaN: [{cid: NaN, label: 'Not specified'}]},
   aliases: {},
@@ -25,39 +27,39 @@ const state = {
 // mutations must be synchronous and can be recorded by plugins
 // for debugging purposes.
 const mutations = {
-  incrDebounceCounter (state) {
+  [mt.incrDebounceCounter] (state) {
     state.debounceCounter++;
   },
-  clearDebounceCounter (state) {
+  [mt.clearDebounceCounter] (state) {
     state.debounceCounter = 0;
   },
-  setCurrentUser (state, payload) {
+  [mt.setIndex] (state, {userId, index}) {
+    state.index[userId] = index
+  },
+  [mt.setCurrentUser] (state, payload) {
     state.currentUser = payload;
   },
-  bindAlisToUserId (state, {alias, userId}) {
+  [mt.bindAliasToUserId] (state, {alias, userId}) {
     state.aliases[alias] = userId;
   },
-  setIndex (state, index) {
-    state.index = index
+  [mt.setFetchedGroupsLength] (state) {
+    state.fetchedGroupsLength++;
   },
-  fetchedCommunitiesLength (state) {
-    state.fetchedCommunitiesLength++;
+  [mt.setGroupIdList] (state, {items, user_id}) {
+    state.groupIdList[user_id] = uniq(items.concat(state.groupIdList[user_id]));
   },
-  getCommunityIdList (state, {items, user_id}) {
-    state.communityIdList[user_id] = uniq(items.concat(state.communityIdList[user_id]));
-  },
-  getProfilesFromCommunity (state, {items}) {
+  [mt.setProfilesFromGroup] (state, {items}) {
     state.profileList = uniqBy(state.profileList.concat(items), 'uid');
   },
-  getUser (state, {items}) {
+  [mt.setUser] (state, {items}) {
     state.users[items.uid] = items;
   },
-  getCountries (state, {items, payload}) {
+  [mt.setCountries] (state, {items, payload}) {
     const countries = Object.assign({}, state.countries);
     if (items) items.forEach((country) => countries[country.cid] = {payload, ...country});
     state.countries = countries;
   },
-  getCities (state, {items, country_id}) {
+  [mt.setCities] (state, {items, country_id}) {
     const stateCities = state.cities[country_id] ? state.cities[country_id] : [];
     stateCities.push({cid: NaN, label: 'Not specified'});
     items = items.map((city) => {
@@ -66,125 +68,121 @@ const mutations = {
     });
     state.cities[country_id] = uniqBy(items.concat(stateCities), 'cid');
   },
-  getNext (state, {items}) {
-    mutations.getProfilesFromCommunity(state, {items});
+  [mt.setNext] (state, {items}) {
+    mutations.setProfilesFromGroup(state, {items});
+  },
+  [mt.clearProfileList] (state) {
+    state.index[state.currentUser.userId] = 0;
+    state.profileList = [];
   },
 };
 
 // actions are functions that causes side effects and can involve
 // asynchronous operations.
 const actions = {
-  incrCheckAndWait({commit, state}) {
-    commit('incrDebounceCounter');
+  [at.incrCheckAndWait] ({commit, state}) {
+    commit(mt.incrDebounceCounter);
     if (state.debounceCounter === 5) {
-      commit('clearDebounceCounter');
+      commit(mt.clearDebounceCounter);
       return new Promise((resolve, reject) => {
-        // A mock async action using setTimeout
-        setTimeout(function () {
+        setTimeout(() => {
           console.log('timeout');
           resolve(true);
         }, 1000);
       })
-    } else {
-      return new Promise((resolve, reject) => {
-        setTimeout(function () {
-          resolve(true);
-        }, 0);
-      })
-    }
+    } else return new Promise((resolve, reject) => setTimeout(() => resolve(true), 0))
   },
-  getUser ({commit, dispatch}, user_ids) {
+  [at.getUser] ({commit, dispatch}, user_ids) {
     return fetchUser({user_ids})
       .then((items) => {
-        return dispatch('incrCheckAndWait').then(() => {
+        return dispatch(at.incrCheckAndWait).then(() => {
           items.screen_name = user_ids;
-          commit('getUser', {items});
+          commit(mt.setUser, {items});
           if (items && items.uid) {
-            commit('bindAlisToUserId', {alias: user_ids, userId: items.uid});
+            commit(mt.bindAliasToUserId, {alias: user_ids, userId: items.uid});
           }
           return items;
         })
       });
   },
-  getCountries ({commit, dispatch}) {
-    return fetchCountries()
+  [at.getCountries] ({commit, dispatch}, payload) {
+    return fetchCountries(payload)
       .then((items) => {
-        return dispatch('incrCheckAndWait').then(() => {
-          commit('getCountries', {items});
+        return dispatch(at.incrCheckAndWait).then(() => {
+          commit(mt.setCountries, {items, payload});
           return items;
         });
       });
   },
-  getCities ({commit, dispatch}, payload) {
+  [at.getCities] ({commit, dispatch}, payload) {
     return fetchCities(payload)
       .then((items) => {
-        return dispatch('incrCheckAndWait').then(() => {
-          commit('getCities', {items, country_id: payload.country_id});
+        return dispatch(at.incrCheckAndWait).then(() => {
+          commit(mt.setCities, {items, country_id: payload.country_id});
           return items;
         });
       });
   },
-  getCommunityIdList ({commit, dispatch}, user_id) {
-    return fetchCommunities({user_id})
+  [at.getGroupIdList] ({commit, dispatch}, user_id) {
+    return fetchGroups({user_id})
       .then((items) => {
-        return dispatch('incrCheckAndWait').then(() => {
-          commit('getCommunityIdList', {items, user_id});
+        return dispatch(at.incrCheckAndWait).then(() => {
+          commit(mt.setGroupIdList, {items, user_id});
           return items;
         });
       });
   },
-  getProfilesFromCommunity ({commit, dispatch}, payload) {
+  [at.getProfilesFromGroup] ({commit, dispatch}, payload) {
     return fetchMembers(payload)
       .then(items => {
-        return dispatch('incrCheckAndWait').then(() => {
-          commit('fetchedCommunitiesLength');
-          commit('getProfilesFromCommunity', {items});
+        return dispatch(at.incrCheckAndWait).then(() => {
+          commit(mt.setFetchedGroupsLength);
+          commit(mt.setProfilesFromGroup, {items});
           return items;
         });
       });
   },
-  getCountriesByCode ({dispatch, commit}, payload) {
-    return fetchCountriesByCode(payload)
-      .then(items => {
-          return dispatch('incrCheckAndWait').then(() => {
-            commit('getCountries', {items, payload});
-            return items;
-          });
-      });
-  },
-  getNextNext ({dispatch, commit, state}, payload) {
-    return dispatch('getCommunityIdList', payload.userId)
-    // return actions.getCommunityIdList({ commit }, payload.userId)
+  [at.getFirstNext] ({dispatch, commit, state}, payload) {
+    return dispatch(at.getGroupIdList, payload.userId)
+    // return actions.getGroupIdList({ commit }, payload.userId)
       .then(items => {
         return actions.getNext({dispatch, commit, state}, {items, ...payload});
       });
   },
-  getNext ({dispatch, commit, state}, {items, ...payload}) {
+  [at.getNext] ({dispatch, commit, state}, {items, ...payload}) {
     // payload is options for profile searching
-    items = items ? items : state.communityIdList[payload.userId];
-    const nextIndex = state.index + 1;
+    items = items ? items : state.groupIdList[payload.userId];
+    let index = state.index[payload.userId];
+    let nextIndex = !index && index !== 0 ? 0 : index + 1;
+    if (!nextIndex) {
+      commit(mt.setIndex, {userId: payload.userId, index: 0});
+      nextIndex = 0;
+    }
     if (nextIndex < items.length) {
-      commit('setIndex', nextIndex);
-      commit('setCurrentUser', payload);
-      return dispatch('getProfilesFromCommunity', {
-        group_id: items[state.index], ...payload
+      commit(mt.setIndex, {userId: payload.userId, index: nextIndex});
+      commit(mt.setCurrentUser, payload);
+      return dispatch(at.getProfilesFromGroup, {
+        group_id: items[state.index[payload.userId]], ...payload
       }).then(profiles => {
         if (profiles) {
-          return commit('getNext', {items: profiles});
+          return commit(mt.setNext, {items: profiles});
         }
       })
     }
   },
+  [at.clearProfileList] ({commit}) {
+    commit(mt.clearProfileList);
+  }
 };
 
 // getters are functions
 export const getters = {
-  getStateIndex: state => state.index,
+  getStateIndex: state => (userId) => state.index[userId],
   getCurrentCities: state => (country_id) => state.cities[country_id],
   getProfileList: state => state.profileList,
   getStoredUserId: state => (userId) => state.aliases[userId],
-  getCurrentUserCommunities: state => state.communityIdList[state.currentUser.userId],
-  getUserCommunities: state => (userId) => state.communityIdList[userId],
+  getCurrentUserGroups: state => state.groupIdList[state.currentUser.userId],
+  getUserGroups: state => (userId) => state.groupIdList[userId],
 };
 
 // A Vuex instance is created by combining the state, mutations, actions,

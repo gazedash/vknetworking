@@ -17,7 +17,7 @@
         return this.$store.getters.getProfileList
       },
       size () {
-        return this.$store.state.fetchedCommunitiesLength
+        return this.$store.state.fetchedGroupsLength
       },
     },
     components: {
@@ -26,7 +26,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   #shell {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;

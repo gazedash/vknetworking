@@ -4,10 +4,10 @@ import Login from "./components/Login";
 import Vue from "vue";
 import store from './store'
 import MuseUI from 'muse-ui'
-import 'muse-ui/dist/muse-ui.css'
 import VueRouter from 'vue-router'
 import {redirected, logout, ifLoggedIn, requireAuth, initialCheck} from './utils/auth'
 import lazy from './directives/lazy';
+import 'muse-ui/dist/muse-ui.css'
 
 Vue.use(MuseUI);
 Vue.use(VueRouter);

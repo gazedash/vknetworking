@@ -2,30 +2,31 @@
   <div>
     <mu-paper class="paper" :zDepth="1">
       <div class="list">
-        <person v-for="el in list" :profile="el"></person>
+        <profile v-for="p in list" :profile="p"></profile>
       </div>
     </mu-paper>
-    <div class="stats">Communities: {{ size }} Profiles: {{ list.length }}</div>
+    <div class="stats">Groups: {{ size }} Profiles: {{ list.length }}</div>
   </div>
 </template>
 
 <script>
-  import Person from '../components/Person'
+  import Profile from '../components/Profile'
   import {isContentSmallerThanWindow, isBottomOfPage} from "../utils/index";
   import debounce from 'lodash/debounce';
+  import * as at from "../store/actionTypes";
 
   export default {
     name: 'profile-list',
     props: ['list', 'size'],
     components: {
-      Person,
+      Profile
     },
     methods: {
       fetchNew: debounce(
         function () {
           const {currentUser} = this.$store.state;
           if (currentUser) {
-            this.$store.dispatch('getNext', currentUser)
+            this.$store.dispatch(at.getNext, currentUser)
           }
         }, 400),
     },
@@ -43,10 +44,7 @@
         const diff = items.length - oldItems.length;
         const screenSizeIsNotChanged = items.pageLength === oldItems.pageLength;
         const notEnoughNewProfiles = isBottomOfPage() && (screenSizeIsNotChanged || diff < 5);
-//        const notEnoughNewProfiles = isBottomOfPage() && (screenSizeIsNotChanged || diff < 5);
-//        const noNewProfiles = items.length === oldItems.length && items.size !== oldItems.size;
         if (notEnoughNewProfiles) {
-//        if (isContentSmallerThanWindow() && noNewProfiles) {
             this.fetchNew();
         }
       },
@@ -55,8 +53,12 @@
 </script>
 
 <style scoped>
+  .paper {
+    display: block;
+    padding: 0 0 10px 0;
+  }
+
   .list {
-    margin: 4.5em 0 10px 0;
     display: inline-flex;
     justify-content: center;
     flex-flow: row wrap;

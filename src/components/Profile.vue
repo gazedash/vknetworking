@@ -1,7 +1,7 @@
 <template>
-  <div class="el">
+  <div class="root">
     <div>
-      <a v-on:mouseenter="mouseOver(profile.uid)" v-on:mouseleave="mouseLeave" :href="'https://vk.com/id' + profile.uid" target="_blank">
+      <a @mouseenter="mouseOver(profile.uid)" @mouseleave="mouseLeave" :href="'https://vk.com/id' + profile.uid" target="_blank">
         <div class="image">
           <img v-lazy="profile.photo_max"/>
           <div v-if="activeId === profile.uid" class="name">
@@ -15,7 +15,7 @@
 
 <script>
   export default {
-    name: 'person',
+    name: 'profile',
     props: ['profile'],
     data () {
       return {
@@ -40,20 +40,28 @@
 </script>
 
 <style scoped>
+  .root {
+    /*box-shadow: 0 27px 55px 0 rgba(0, 0, 0, 0.1), 0 7px 12px 0 rgba(0, 0, 0, 0.10);*/
+    background-color: #fafafa;
+  }
+
   img {
     height: 200px;
     width: 200px;
   }
+
   a {
     display: block;
     text-decoration: none;
     color: black;
   }
+
   .image {
     z-index: 0;
     display: flex;
     justify-content: center;
   }
+
   .name {
     background-color: rgba(0,0,0,0.25);
     color: #fff;
@@ -64,6 +72,21 @@
     overflow: hidden;
     padding: 5px 0 5px 0;
     text-align: center;
+  }
+
+  @media screen and (max-width: 360px) {
+    img {
+      height: 100px;
+      width: 100px;
+    }
+    .name {
+      word-break: keep-all;
+      overflow: hidden;
+      font-size: 10px;
+      padding: 2px 0 2px 0;
+      margin-top: 6em;
+      width: 100px;
+    }
   }
   @media screen and (min-width: 1220px) {
     img {
@@ -94,9 +117,5 @@
       margin-top: 17.8em;
       width: 280px;
     }
-  }
-  .el {
-    /*box-shadow: 0 27px 55px 0 rgba(0, 0, 0, 0.1), 0 7px 12px 0 rgba(0, 0, 0, 0.10);*/
-    background-color: #fafafa;
   }
 </style>

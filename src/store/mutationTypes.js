@@ -1,0 +1,13 @@
+export const incrDebounceCounter = 'incrDebounceCounter';
+export const clearDebounceCounter = 'clearDebounceCounter';
+export const setCurrentUser = 'setCurrentUser';
+export const bindAliasToUserId = 'bindAliasToUserId';
+export const setIndex = 'setIndex';
+export const setFetchedGroupsLength = 'setFetchedGroupsLength';
+export const setGroupIdList = 'setGroupIdList';
+export const setProfilesFromGroup = 'setProfilesFromGroup';
+export const setUser = 'setUser';
+export const setCountries = 'setCountries';
+export const setCities = 'setCities';
+export const setNext = 'setNext';
+export const clearProfileList = 'clearProfileList';

@@ -1,48 +1,51 @@
 <template>
-  <mu-popup position="top" popupClass="popup" :open="open" @close="close('top')">
-    <mu-paper class="paper" :zDepth="2">
-      <welcome v-if="!user.doNotShowAgain" v-on:doNotShowAgain="doNotShowAgain"></welcome>
-      <div class="profile-link">
-        <mu-text-field hintText="enter id or link" label="Profile" v-model.trim="profileLink"/>
-      </div>
-      <div class="search">
-        <mu-text-field hintText="enter search query" label="Search query" v-model.trim="query"/>
-      </div>
-      <div class="country">
-        <mu-auto-complete openOnFocus :filter="filterSource" v-model="countryInput" :dataSource="countriesArr"
-                          :dataSourceConfig="dataSourceConfigCountry"
-                          @blur="blur" @select="handlechange"></mu-auto-complete>
-      </div>
-      <div class="city">
-        <mu-auto-complete openOnFocus :filter="filterSource" v-model="cityInput" :dataSource="cityArr"
-                          :dataSourceConfig="dataSourceConfigCity"
-                          @blur="blurCity" @select="handlechangeCity"></mu-auto-complete>
-        <!--<mu-select-field v-model="city" :labelFocusClass="['label-focus']" label="City">-->
-        <!--<mu-menu-item v-for="city in cities" ccc="dddd" ttt="ddd" :value="city.cid" :title="city.title"/>-->
-        <!--</mu-select-field>-->
-      </div>
-      <div class="sex">
-        <mu-radio label="Male" name="group" nativeValue="2" v-model="sex" class="sex-radio"/>
-        <mu-radio label="Female" name="group" nativeValue="1" v-model="sex" class="sex-radio"/>
-        <mu-radio label="All" name="group" nativeValue="0" v-model="sex" class="sex-radio"/>
-      </div>
-      <div class="age">
-        <mu-text-field hintText="from" v-model.trim.number="age_from"/>
-        <mu-text-field hintText="to" v-model.trim.number="age_to"/>
-      </div>
-      <div class="control">
-        <mu-flat-button @click="onSubmitLocal" label="GO!"/>
-        <mu-flat-button @click="close('top')" label="HIDE"/>
-      </div>
-    </mu-paper>
-  </mu-popup>
+  <div>
+    <my-popup position="top" :open="open" @close="close('top')">
+      <reset-button @reset="resetForm"></reset-button>
+      <mu-paper class="paper" :zDepth="1">
+        <div>
+          <welcome v-if="!user.doNotShowAgain" @doNotShowAgain="doNotShowAgain"></welcome>
+        </div>
+        <div class="profile-link">
+          <mu-text-field hintText="enter id or link" label="Profile" v-model.trim="profileLink"/>
+        </div>
+        <div class="search">
+          <mu-text-field hintText="enter search query" label="Search query" v-model.trim="query"/>
+        </div>
+        <div class="country">
+          <mu-auto-complete openOnFocus :filter="filterSource" v-model="countryInput" :dataSource="countriesArr"
+                            :dataSourceConfig="dataSourceConfigCountry"
+                            @blur="blur" @select="handlechange"></mu-auto-complete>
+        </div>
+        <div class="city">
+          <mu-auto-complete openOnFocus :filter="filterSource" v-model="cityInput" :dataSource="cityArr"
+                            :dataSourceConfig="dataSourceConfigCity"
+                            @blur="blurCity" @select="handlechangeCity"></mu-auto-complete>
+        </div>
+        <div class="sex">
+          <mu-radio label="Male" name="group" nativeValue="2" v-model="sex" class="sex-radio"/>
+          <mu-radio label="Female" name="group" nativeValue="1" v-model="sex" class="sex-radio"/>
+          <mu-radio label="All" name="group" nativeValue="0" v-model="sex" class="sex-radio"/>
+        </div>
+        <div class="age">
+          <mu-text-field hintText="from" v-model.trim.number="age_from"/>
+          <mu-text-field hintText="to" v-model.trim.number="age_to"/>
+        </div>
+        <div class="control">
+          <mu-flat-button @click="onSubmitLocal" label="GO!"/>
+          <mu-flat-button @click="close('top')" label="HIDE"/>
+        </div>
+      </mu-paper>
+    </my-popup>
+  </div>
 </template>
 
 <script>
   import Welcome from './Welcome';
+  import ResetButton from './ResetButton';
+  import MyPopup from './MyPopup';
   import {user, setDoNotShowAgain} from '../utils/auth';
   import _ from 'lodash';
-  import uniq from 'lodash/uniq';
   import countries from "i18n-iso-countries";
   export default {
     name: 'search-popup',
@@ -67,22 +70,22 @@
     },
     props: {
       open: {
-          type: Boolean,
-          default: true,
+        type: Boolean,
+        default: true,
       },
       close: {
-          type: Function,
+        type: Function,
       },
       onSubmit: {
         type: Function,
       },
       cities: {
-          type: Array,
-          default: [],
+        type: Array,
+        default: [],
       },
       countries: {
-          type: Object,
-          default: {},
+        type: Object,
+        default: {},
       }
     },
     computed: {
@@ -113,8 +116,9 @@
         }
       },
       country (cid) {
-        // does this even change anything
-        this.$emit('changeCountry', cid);
+        if (cid) {
+          this.$emit('changeCountry', cid);
+        }
       },
       cities (cities) {
         this.city = cities[0].cid;
@@ -133,7 +137,9 @@
           this.country = co.cid;
         } else {
           const code = countries.getAlpha2Code(country, 'en');
-          this.$emit('getCountryByCode', {code, country});
+          if (code) {
+            this.$emit('getCountryByCode', {code, country});
+          }
         }
       },
       blurCity (e) {
@@ -158,39 +164,19 @@
       },
       doNotShowAgain() {
         setDoNotShowAgain();
-      }
+      },
+      resetForm() {
+        Object.entries(this.searchData).forEach(
+          ([key, value]) => this[key] = null
+        );
+      },
     },
-    components: {Welcome},
+    components: {Welcome, ResetButton, MyPopup},
   }
 </script>
 
-<style>
+<style scoped>
   .paper {
-    padding: 14px 25px 14px 25px;
-  }
-
-  .sex {
-    display: flex;
-    justify-content: space-around;
-  }
-
-  .age {
-    display: flex;
-    justify-content: flex-start;
-  }
-
-  .age > div {
-    margin: 5px 10px;
-    width: 40px;
-    font-size: 14px;
-  }
-
-  .age > div:first-child {
-    margin-left: 0;
-  }
-
-  .control {
-    display: flex;
-    justify-content: flex-end;
+  padding: 14px 25px 14px 25px;
   }
 </style>

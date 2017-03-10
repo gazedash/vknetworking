@@ -1,0 +1,9 @@
+export const incrCheckAndWait = 'incrCheckAndWait';
+export const getUser = 'getUser';
+export const getCountries = 'getCountries';
+export const getCities = 'getCities';
+export const getGroupIdList = 'getGroupIdList';
+export const getProfilesFromGroup = 'getProfilesFromGroup';
+export const getFirstNext = 'getFirstNext';
+export const getNext = 'getNext';
+export const clearProfileList = 'clearProfileList';

@@ -1,15 +1,10 @@
-
 export const client_id = 5899859;
-// function checkToken(userId) {
-//   appId + userId + secretKey
-// }
 
 //const api_key = "API_KEY";
-// https://api.vk.com/method/users.search?group_id=97408246&fields=photo_max,first_name,last_name&online=0&city=139&sex=0&has_photo=1&access_token=API_KEY
 import fetchJsonp from "fetch-jsonp";
 import _ from 'lodash';
 
-function api_key() { return localStorage.token; };
+function api_key() { return localStorage.token; }
 const endpoint = "https://api.vk.com";
 const OAuthEndpoint = "https://oauth.vk.com/authorize?";
 export const redirect_uri = "https://vknetworking-8c4dd.firebaseapp.com/auth";
@@ -28,7 +23,7 @@ function paramsToString(params) {
 
 export function buildGetMembersUrl(params) {
   // sex=1: female
-  console.log(baseMethod('users.search') + paramsToString(params) + '&count=1000&fields=photo_max,first_name,last_name&online=0');
+  // console.log(baseMethod('users.search') + paramsToString(params) + '&count=1000&fields=photo_max,first_name,last_name&online=0');
   return baseMethod('users.search') + paramsToString(params) + '&count=1000&fields=photo_max,first_name,last_name&online=0';
   // hometown?
 }
@@ -38,22 +33,22 @@ export function buildGetCountries() {
 }
 
 export function buildGetCities(params) {
-  console.log(baseMethod('database.getCities') + paramsToString(params));
+  // console.log(baseMethod('database.getCities') + paramsToString(params));
   return baseMethod('database.getCities') + paramsToString(params);
 }
 
 export function buildGetSubscriptions(params) {
-  console.log(baseMethod('users.getSubscriptions') + paramsToString(params) + '&extended=0');
+  // console.log(baseMethod('users.getSubscriptions') + paramsToString(params) + '&extended=0');
   return baseMethod('users.getSubscriptions') + paramsToString(params) + '&extended=0';
 }
 
 export function buildGetCountriesByCode(params) {
-  console.log(baseMethod('database.getCountries') + paramsToString(params));
+  // console.log(baseMethod('database.getCountries') + paramsToString(params));
   return baseMethod('database.getCountries') + paramsToString(params);
 }
 
 export function buildGetUser(params) {
-  console.log(baseMethod('users.get') + paramsToString(params));
+  // console.log(baseMethod('users.get') + paramsToString(params));
   return baseMethod('users.get') + paramsToString(params);
 }
 
@@ -82,23 +77,9 @@ export function fetchUser({user_ids}) {
     });
 }
 
-export function fetchCountriesByCode({code}) {
-  return fetchJsonp(buildGetCountriesByCode({code}))
+export function fetchCountries({code = null} = {}) {
+  return fetchJsonp(code ? buildGetCountriesByCode({code}) : buildGetCountries())
     .then(response => response.json())
-    .then(json => {
-      logError(json);
-      if (json.response) {
-        return json.response;
-      }
-      return [];
-    })
-}
-
-export function fetchCountries() {
-  return fetchJsonp(buildGetCountries())
-    .then(response => {
-      return response.json();
-    })
     .then(json => {
       logError(json);
       if (json.response) {
@@ -124,7 +105,7 @@ export function fetchCities({country_id = 1, q = "", need_all = 0, count = 100})
     });
 }
 
-export function fetchCommunities({user_id}) {
+export function fetchGroups({user_id}) {
   // return Promise.resolve(
   //   JSON.parse("MOCK_DATA")
   // ).then(data => data);

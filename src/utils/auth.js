@@ -3,10 +3,6 @@ export let user = {
   doNotShowAgain: false,
 };
 
-export function getToken () {
-  return localStorage.token;
-}
-
 export function logout (to, from, next) {
   delete localStorage.token;
   user.authenticated = false;
