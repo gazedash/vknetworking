@@ -28,16 +28,16 @@
           if (currentUser) {
             this.$store.dispatch(at.getNext, currentUser)
           }
-        }, 400),
+        }, 400)
     },
     computed: {
       items() {
         return {
           length: this.list.length,
           size: this.size,
-          pageLength: document.documentElement.scrollHeight,
+          pageLength: document.documentElement.scrollHeight
         }
-      },
+      }
     },
     watch: {
       items(items, oldItems) {
@@ -47,7 +47,7 @@
         if (notEnoughNewProfiles) {
             this.fetchNew();
         }
-      },
+      }
     }
   }
 </script>

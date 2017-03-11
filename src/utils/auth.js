@@ -3,29 +3,33 @@ export let user = {
   doNotShowAgain: false,
 };
 
-export function logout (to, from, next) {
+export function logout () {
   delete localStorage.token;
   user.authenticated = false;
-  next('/login')
 }
 
 export function redirected(to, from, next) {
   if (to.hash) {
     const userId = to.hash.split('user_id=')[1];
     localStorage.setItem("lastLoginUserId", userId);
-    console.log(userId);
     const token = to.hash.split('access_token=')[1].split("&")[0];
-    localStorage.setItem("token", token);
-    user.authenticated = true;
+    if (token) {
+      localStorage.setItem("token", token);
+      user.authenticated = true;
+    } else {
+      window.close();
+      next('/login');
+    }
   }
   window.close();
+  next('/');
 }
 
 export function ifLoggedIn(to, from, next) {
+  console.log('to login');
   if (checkAuth()) {
     next('/')
   } else {
-    console.log('to login');
     next();
   }
 }

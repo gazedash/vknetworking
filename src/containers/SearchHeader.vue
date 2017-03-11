@@ -31,7 +31,7 @@
   import {isBottomOfPage} from "../utils/index";
   import debounce from 'lodash/debounce';
   import _ from 'lodash';
-  import {checkAuth} from "../utils/auth";
+  import {checkAuth, logout} from "../utils/auth";
   import * as at from "../store/actionTypes";
   export default {
     name: 'search',
@@ -51,7 +51,8 @@
     created () {
       this.$store.dispatch(at.getCountries).then((res) => {
           if (checkAuthError(res)) {
-            this.$router.push('/logout');
+            logout();
+            this.$router.push({name: 'login', params: { renew: true }});
           }
       });
       window.addEventListener('scroll', debounce(() => {

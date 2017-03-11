@@ -15,12 +15,12 @@
         <div class="country">
           <mu-auto-complete openOnFocus :filter="filterSource" v-model="countryInput" :dataSource="countriesArr"
                             :dataSourceConfig="dataSourceConfigCountry"
-                            @blur="blur" @select="handlechange"></mu-auto-complete>
+                            @blur="blur" @select="handleChange"></mu-auto-complete>
         </div>
         <div class="city">
           <mu-auto-complete openOnFocus :filter="filterSource" v-model="cityInput" :dataSource="cityArr"
                             :dataSourceConfig="dataSourceConfigCity"
-                            @blur="blurCity" @select="handlechangeCity"></mu-auto-complete>
+                            @blur="blurCity" @select="handleChangeCity"></mu-auto-complete>
         </div>
         <div class="sex">
           <mu-radio label="Male" name="group" nativeValue="2" v-model="sex" class="sex-radio"/>
@@ -153,10 +153,10 @@
           this.$emit('getCityByQuery', {city, code, country: this.country, countryInput: this.countryInput});
         }
       },
-      handlechange (country) {
+      handleChange (country) {
         this.country = country.cid;
       },
-      handlechangeCity (city) {
+      handleChangeCity (city) {
         this.city = city.cid;
       },
       onSubmitLocal() {

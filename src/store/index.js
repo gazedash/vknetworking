@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import {fetchGroups, fetchMembers, fetchCountries, fetchCities, fetchUser, fetchCountriesByCode} from "../vk_api/index";
+import {fetchGroups, fetchMembers, fetchCountries, fetchCities, fetchUser} from "../vk_api/index";
 import uniqBy from "lodash/uniqBy";
 import uniq from "lodash/uniq";
 import * as mt from "./mutationTypes";

@@ -1,8 +1,7 @@
 export const client_id = 5899859;
 
-//const api_key = "API_KEY";
 import fetchJsonp from "fetch-jsonp";
-import _ from 'lodash';
+import _ from "lodash";
 
 function api_key() { return localStorage.token; }
 const endpoint = "https://api.vk.com";
@@ -52,7 +51,7 @@ export function buildGetUser(params) {
   return baseMethod('users.get') + paramsToString(params);
 }
 
-export function buildVkAuthUrl({client_id, scope = "groups", redirect_uri = window.location.origin + '/auth', display = "page", v = "5.626", response_type = "token"}) {
+export function buildVkAuthUrl({scope = "groups", display = "page", v = "5.626", response_type = "token"}) {
   return `${OAuthEndpoint}client_id=${client_id}&scope=${scope}&redirect_uri=${redirect_uri}&display=${display}&v=${v}&response_type=${response_type}`
 }
 
