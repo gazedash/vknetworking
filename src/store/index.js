@@ -73,6 +73,7 @@ const mutations = {
   },
   [mt.clearProfileList] (state) {
     state.index[state.currentUser.userId] = 0;
+    state.fetchedGroupsLength = 0;
     state.profileList = [];
   },
 };

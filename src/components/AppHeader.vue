@@ -1,6 +1,6 @@
 <template>
   <div>
-    <mu-appbar>
+    <mu-appbar class="app-bar">
       <div slot="left">
         <slot name="left"></slot>
       </div>

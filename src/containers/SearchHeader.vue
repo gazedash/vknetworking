@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <app-header>
+  <div class="header">
+    <app-header class="app-bar">
       <search-button slot="left" @click.native="open('top')"></search-button>
       <div class="right" slot="right">
         <clear-list-button @clear="clear" class="clear"></clear-list-button>
@@ -129,4 +129,11 @@
   }
 </script>
 <style scoped>
+  .header {
+    padding-bottom: 64px;
+  }
+  .app-bar {
+    width: 100%;
+    position: fixed;
+  }
 </style>

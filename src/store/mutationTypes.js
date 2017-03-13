@@ -4,6 +4,7 @@ export const setCurrentUser = 'setCurrentUser';
 export const bindAliasToUserId = 'bindAliasToUserId';
 export const setIndex = 'setIndex';
 export const setFetchedGroupsLength = 'setFetchedGroupsLength';
+export const resetFetchedGroupsLength = 'resetFetchedGroupsLength';
 export const setGroupIdList = 'setGroupIdList';
 export const setProfilesFromGroup = 'setProfilesFromGroup';
 export const setUser = 'setUser';
