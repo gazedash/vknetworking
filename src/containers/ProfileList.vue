@@ -11,7 +11,7 @@
 
 <script>
   import Profile from '../components/Profile'
-  import {isContentSmallerThanWindow, isBottomOfPage} from "../utils/index";
+  import {isBottomOfPage} from "../utils/index";
   import debounce from 'lodash/debounce';
   import * as at from "../store/actionTypes";
 

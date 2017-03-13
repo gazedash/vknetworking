@@ -1,7 +1,7 @@
 import {buildVkAuthUrl} from "../vk_api/index";
 
 export function isBottomOfPage() {
-  return (window.innerHeight + window.scrollY) >= document.body.scrollHeight;
+  return (window.innerHeight + window.scrollY + 800) >= document.body.scrollHeight;
 }
 
 export function isContentSmallerThanWindow() {
