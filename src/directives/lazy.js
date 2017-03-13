@@ -1,10 +1,7 @@
 import {elementInViewport} from "../utils/index";
 export default {
   bind (el, binding) {
-    let img = new Image();
-    img.src = binding.value;
-
-    img.onload = () => {
+    function lazyLoad(el, img) {
       if (elementInViewport(el)) {
         el.src = img.src;
       } else {
@@ -12,6 +9,15 @@ export default {
           el.src = img.src;
         }, Math.floor(100 + (Math.random() * 300)))
       }
+    }
+    let img = new Image();
+    img.src = binding.value;
+
+    img.onload = () => {
+      lazyLoad(el, img)
+    };
+    img.onerror = () => {
+      lazyLoad(el, img)
     }
   }
 };
