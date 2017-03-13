@@ -1,7 +1,7 @@
 <template>
   <div id="shell">
     <search-header></search-header>
-    <profile-list :size="size" :list="list"></profile-list>
+    <profile-list :size="size" :list="list" :ignoreList="ignoreList"></profile-list>
   </div>
 </template>
 
@@ -13,6 +13,9 @@
   export default {
     name: 'shell',
     computed: {
+      ignoreList() {
+        return this.$store.state.ignoreList
+      },
       list () {
         return this.$store.getters.getProfileList
       },

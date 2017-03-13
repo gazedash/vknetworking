@@ -2,7 +2,7 @@
   <div>
     <mu-paper class="paper" :zDepth="1">
       <div class="list">
-        <profile v-for="p in list" :profile="p"></profile>
+        <profile key="p.uid" v-show="show(p.uid)" :seen="seen(p.uid)" @open="open" v-for="p in list" :profile="p"></profile>
       </div>
     </mu-paper>
     <div class="stats">Groups: {{ size }} Profiles: {{ list.length }}</div>
@@ -11,17 +11,32 @@
 
 <script>
   import Profile from '../components/Profile'
-  import {isBottomOfPage} from "../utils/index";
+  import {isBottomOfPage, show} from "../utils/index";
   import debounce from 'lodash/debounce';
   import * as at from "../store/actionTypes";
+  import {strategy as st} from "../const/index";
 
   export default {
     name: 'profile-list',
-    props: ['list', 'size'],
+    props: ['list', 'size', 'ignoreList'],
     components: {
       Profile
     },
+    created() {
+      this.$store.dispatch(at.changeStrategy);
+      this.$store.dispatch(at.appendToIgnoreList)
+    },
     methods: {
+      open(uid) {
+          this.$store.dispatch(at.appendToIgnoreList, {items: [uid]});
+      },
+      show(uid) {
+        return show(this.strategy, !this.ignoreList.includes(uid));
+      },
+      seen(uid) {
+        const strategy = this.strategy === st.noop;
+        return this.ignoreList.includes(uid) && !strategy;
+      },
       fetchNew: debounce(
         function () {
           const {currentUser} = this.$store.state;
@@ -31,10 +46,12 @@
         }, 400)
     },
     computed: {
+      strategy() {
+        return this.$store.state.strategy;
+      },
       items() {
         return {
           length: this.list.length,
-          size: this.size,
           pageLength: document.documentElement.scrollHeight
         }
       }

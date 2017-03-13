@@ -1,0 +1,43 @@
+<template>
+  <div class="root">
+    <mu-select-field @change="change" class="select" :value="strategy">
+      <mu-menu-item key="text" v-for="text in list" :value="text" :title="text"/>
+    </mu-select-field>
+  </div>
+</template>
+
+<script>
+  import {strategy as st} from "../const/index";
+  export default {
+    name: 'ignore-strategy-select',
+    props: {strategy: {default: st.darken}},
+    data () {
+      return {
+        list: [st.noop, st.darken, st.hide, st.aggressive],
+      }
+    },
+    methods: {
+        change(e) {
+            this.$emit('change', e);
+        }
+    }
+  }
+</script>
+
+<style>
+  .root {
+    display: flex;
+    align-items: center;
+  }
+  .select {
+    width: 120px !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+  }
+  .select > div {
+    padding: 0;
+  }
+  .mu-dropDown-menu-text-overflow {
+    color: #fff;
+  }
+</style>

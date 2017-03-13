@@ -5,11 +5,15 @@ import uniqBy from "lodash/uniqBy";
 import uniq from "lodash/uniq";
 import * as mt from "./mutationTypes";
 import * as at from "./actionTypes";
+import {get} from "../utils/storage";
+import {ignoreList, strategy as st} from "../const/index";
 
 Vue.use(Vuex);
 
 const state = {
   index: {},
+  strategy: st.darken,
+  ignoreList: [],
   fetchedGroupsLength: 0,
   profileList: [],
   groupIdList: {},
@@ -76,6 +80,12 @@ const mutations = {
     state.fetchedGroupsLength = 0;
     state.profileList = [];
   },
+  [mt.appendToStateIgnoreList] (state, {items}) {
+    state.ignoreList = items;
+  },
+  [mt.changeStrategy] (state, {strategy}) {
+    state.strategy = strategy;
+  }
 };
 
 // actions are functions that causes side effects and can involve
@@ -173,6 +183,22 @@ const actions = {
   },
   [at.clearProfileList] ({commit}) {
     commit(mt.clearProfileList);
+  },
+  [at.appendToIgnoreList] ({commit}, {items = [], name = ignoreList} = {}) {
+    let array = get(name);
+    array = array && array.length ? array : [array];
+    const res = uniq(items.concat(array));
+    localStorage[name] = JSON.stringify(res);
+    commit(mt.appendToStateIgnoreList, {items: res});
+  },
+  [at.changeStrategy] ({state, commit}, {strategy} = {}) {
+    if (!strategy) {
+      const str = localStorage.strategy;
+      strategy = str ? str : state.strategy;
+    } else {
+      localStorage.strategy = strategy;
+    }
+    commit(mt.changeStrategy, {strategy});
   }
 };
 

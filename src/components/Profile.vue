@@ -1,8 +1,12 @@
 <template>
   <div class="root">
     <div>
-      <a @mouseenter="mouseOver(profile.uid)" @mouseleave="mouseLeave" :href="'https://vk.com/id' + profile.uid" target="_blank">
+      <a @click="open" @mouseenter="mouseOver(profile.uid)" @mouseleave="mouseLeave" :href="'https://vk.com/id' + profile.uid"
+         target="_blank">
+        <div :class="{ seen }">
+        </div>
         <div class="image">
+          <!--@error-->
           <img v-lazy="profile.photo_max"/>
           <div v-if="activeId === profile.uid" class="name">
             {{ profile.first_name }} {{ profile.last_name }}
@@ -16,19 +20,19 @@
 <script>
   export default {
     name: 'profile',
-    props: ['profile'],
+    props: {
+      profile: {type: Object, required: true},
+      seen: {type: Boolean, default: false}
+    },
     data () {
       return {
         activeId: null,
-        msg: 'Welcome to Your Vue.js App'
-      }
-    },
-    created() {
-      if (this.profile && !this.profile.photo_max) {
-          console.log('no photo?', this.profile);
       }
     },
     methods: {
+      open() {
+        this.$emit('open', this.profile.uid)
+      },
       mouseOver(id) {
         this.activeId = id;
       },
@@ -45,7 +49,13 @@
     background-color: #fafafa;
   }
 
-  img {
+  .seen {
+    position: absolute;
+    background: rgba(0,0,0,0.35);
+    z-index: 0;
+  }
+
+  .seen, img {
     height: 200px;
     width: 200px;
   }
@@ -63,7 +73,7 @@
   }
 
   .name {
-    background-color: rgba(0,0,0,0.25);
+    background-color: rgba(0, 0, 0, 0.25);
     color: #fff;
     position: absolute;
     margin-top: 12.1em;
@@ -75,10 +85,11 @@
   }
 
   @media screen and (max-width: 360px) {
-    img {
+    .seen, img {
       height: 100px;
       width: 100px;
     }
+
     .name {
       word-break: keep-all;
       overflow: hidden;
@@ -88,31 +99,37 @@
       width: 100px;
     }
   }
+
   @media screen and (min-width: 1220px) {
-    img {
+    .seen, img {
       height: 240px;
       width: 240px;
     }
+
     .name {
       margin-top: 14.9em;
       width: 240px;
     }
   }
+
   @media screen and (min-width: 1440px) {
-    img {
+    .seen, img {
       height: 260px;
       width: 260px;
     }
+
     .name {
       margin-top: 16.35em;
       width: 260px;
     }
   }
+
   @media screen and (min-width: 1570px) {
-    img {
+    .seen, img {
       height: 280px;
       width: 280px;
     }
+
     .name {
       margin-top: 17.8em;
       width: 280px;

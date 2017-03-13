@@ -1,7 +1,10 @@
 <template>
   <div class="header">
     <app-header class="app-bar">
-      <search-button slot="left" @click.native="open('top')"></search-button>
+      <div class="left" slot="left">
+        <search-button @click.native="open('top')"></search-button>
+        <ignore-strategy-select :strategy="strategy" @change="changeStrategy"></ignore-strategy-select>
+      </div>
       <div class="right" slot="right">
         <clear-list-button @clear="clear" class="clear"></clear-list-button>
         <logout></logout>
@@ -27,15 +30,17 @@
   import Logout from '../components/Logout';
   import ClearListButton from '../components/ClearListButton'
   import SearchButton from '../components/SearchButton';
+  import IgnoreStrategySelect from '../components/IgnoreStrategySelect';
   import SearchPopup from '../components/SearchPopup';
   import {isBottomOfPage} from "../utils/index";
   import debounce from 'lodash/debounce';
   import _ from 'lodash';
   import {checkAuth, logout} from "../utils/auth";
   import * as at from "../store/actionTypes";
+  import * as mt from "../store/mutationTypes";
   export default {
     name: 'search',
-    components: {AppHeader, SearchButton, SearchPopup, Logout, ClearListButton},
+    components: {AppHeader, SearchButton, SearchPopup, Logout, ClearListButton, IgnoreStrategySelect},
     data () {
       return {
         cities: [],
@@ -44,6 +49,9 @@
       }
     },
     computed: {
+      strategy () {
+          return this.$store.state.strategy;
+      },
       countries () {
         return this.$store.state.countries;
       },
@@ -125,10 +133,16 @@
       clear() {
           this.$store.dispatch(at.clearProfileList);
       },
+      changeStrategy(strategy) {
+        this.$store.dispatch(at.changeStrategy, {strategy});
+      }
     },
   }
 </script>
 <style scoped>
+  .left {
+    display: flex;
+  }
   .header {
     padding-bottom: 64px;
   }

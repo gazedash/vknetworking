@@ -12,3 +12,5 @@ export const setCountries = 'setCountries';
 export const setCities = 'setCities';
 export const setNext = 'setNext';
 export const clearProfileList = 'clearProfileList';
+export const appendToStateIgnoreList = 'appendToStateIgnoreList';
+export const changeStrategy = 'changeStrategy';

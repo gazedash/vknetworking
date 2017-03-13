@@ -7,3 +7,5 @@ export const getProfilesFromGroup = 'getProfilesFromGroup';
 export const getFirstNext = 'getFirstNext';
 export const getNext = 'getNext';
 export const clearProfileList = 'clearProfileList';
+export const appendToIgnoreList = 'appendToIgnoreList';
+export const changeStrategy = 'changeStrategy';

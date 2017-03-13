@@ -1,7 +1,22 @@
 import {buildVkAuthUrl} from "../vk_api/index";
+import {strategy as st} from "../const/index";
 
 export function isBottomOfPage() {
   return (window.innerHeight + window.scrollY + 800) >= document.body.scrollHeight;
+}
+
+export function show(strategy, cb) {
+  switch (strategy) {
+    case st.noop:
+      return true;
+      break;
+    case st.darken:
+      return true;
+      break;
+    case st.hide:
+    case st.aggressive:
+      return cb;
+  }
 }
 
 export function isContentSmallerThanWindow() {

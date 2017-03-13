@@ -21,6 +21,9 @@ export default {
 </script>
 
 <style scoped>
+  .app-bar {
+    z-index: 2;
+  }
   .home {
     text-align: center;
   }
