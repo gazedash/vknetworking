@@ -3,7 +3,6 @@ export const LOGIN_ERROR = "Bad login information";
 export const ignoreList = 'ignoreList';
 export const strategy = {
   noop: 'none',
-  darken: 'darken',
-  hide: 'hide',
-  aggressive: 'aggressive',
+  darkenOnClick: 'on click',
+  darkenOnScroll: 'on scroll',
 };

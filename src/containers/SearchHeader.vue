@@ -56,20 +56,26 @@
         return this.$store.state.countries;
       },
     },
-    created () {
+    created() {
       this.$store.dispatch(at.getCountries).then((res) => {
           if (checkAuthError(res)) {
             logout();
             this.$router.push({name: 'login', params: { renew: true }});
           }
       });
-      window.addEventListener('scroll', debounce(() => {
-        if (isBottomOfPage()) {
-          this.onSubmit();
-        }
-      }, 335));
+      window.addEventListener('scroll', this.submitOnBottomOfPage);
+    },
+    beforeDestroy() {
+      window.removeEventListener('scroll', this.submitOnBottomOfPage)
     },
     methods: {
+      submitOnBottomOfPage: debounce(
+          function () {
+            if (isBottomOfPage()) {
+              this.onSubmit();
+            }
+          }, 335
+      ),
       changeCities (country_id) {
         const currentCities = this.$store.getters.getCurrentCities(country_id);
         if (currentCities) {

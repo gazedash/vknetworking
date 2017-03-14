@@ -10,11 +10,10 @@ export function show(strategy, cb) {
     case st.noop:
       return true;
       break;
-    case st.darken:
+    case st.darkenOnClick:
       return true;
       break;
-    case st.hide:
-    case st.aggressive:
+    case st.darkenOnScroll:
       return cb;
   }
 }
@@ -42,15 +41,37 @@ export function windowClosedPromise(win) {
   })
 }
 
-export function elementInViewport(el) {
+export function isElementFullyInViewport (el) {
   const rect = el.getBoundingClientRect();
+  const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+  const windowWidth = (window.innerWidth || document.documentElement.clientWidth);
 
   return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
+    (rect.left >= 0)
+    && (rect.top >= 0)
+    && ((rect.left + rect.width) <= windowWidth)
+    && ((rect.top + rect.height) <= windowHeight)
   );
+}
+
+export function isElementHigher(el) {
+  const rect = el.getBoundingClientRect();
+  // console.log({el});
+  return (el.offsetTop + rect.height) <= window.pageYOffset;
+}
+
+export function isElementInViewport(el) {
+  const rect = el ? el.getBoundingClientRect() : null;
+  if (rect) {
+    return (
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
+    );
+  } else {
+    return false;
+  }
 }
 
 export function redirectToGetToken() {
@@ -67,4 +88,29 @@ export function createPopup({url = '', popupWidth = 655, popupHeight = 350}) {
 
 export function createSignInPopup() {
   return createPopup({url: buildVkAuthUrl({})});
+}
+
+export function onScroll(delta = 0, downCb = function() {}, upCb = function() {}) {
+  const st = window.pageYOffset || document.documentElement.scrollTop;
+  if (st > delta){
+    downCb();
+    // downscroll code
+  } else {
+    upCb();
+    // upscroll code
+  }
+//          this.lastScrollTop = st;
+  return st;
+}
+
+export function addOrRemoveListener({newStrategy, oldStrategy, cmpStrategy, listener}) {
+  if (newStrategy === cmpStrategy) {
+    if (newStrategy !== oldStrategy) {
+      window.addEventListener('scroll', listener)
+    }
+  } else {
+    if (oldStrategy === st.darkenOnScroll) {
+      window.removeEventListener('scroll', listener)
+    }
+  }
 }

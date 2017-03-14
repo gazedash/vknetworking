@@ -10,10 +10,10 @@
   import {strategy as st} from "../const/index";
   export default {
     name: 'ignore-strategy-select',
-    props: {strategy: {default: st.darken}},
+    props: {strategy: {default: st.darkenOnClick}},
     data () {
       return {
-        list: [st.noop, st.darken, st.hide, st.aggressive],
+        list: [st.noop, st.darkenOnClick, st.darkenOnScroll],
       }
     },
     methods: {

@@ -2,7 +2,12 @@
   <div>
     <mu-paper class="paper" :zDepth="1">
       <div class="list">
-        <profile key="p.uid" v-show="show(p.uid)" :seen="seen(p.uid)" @open="open" v-for="p in list" :profile="p"></profile>
+        <profile
+          v-for="p in list"
+          :profile="p"
+          key="p.uid"
+          :seen="seen(p.uid)"
+          @open="open"></profile>
       </div>
     </mu-paper>
     <div class="stats">Groups: {{ size }} Profiles: {{ list.length }}</div>
@@ -11,41 +16,38 @@
 
 <script>
   import Profile from '../components/Profile'
-  import {isBottomOfPage, show} from "../utils/index";
-  import debounce from 'lodash/debounce';
-  import * as at from "../store/actionTypes";
-  import {strategy as st} from "../const/index";
+  import {isBottomOfPage, show, isElementHigher, addOrRemoveListener} from "../utils/index"
+  import debounce from 'lodash/debounce'
+  import * as at from "../store/actionTypes"
+  import {strategy as st} from "../const/index"
+  import {onScroll} from '../utils'
+  import flatten from 'lodash/flatten';
 
   export default {
     name: 'profile-list',
     props: ['list', 'size', 'ignoreList'],
+    data () {
+      return {
+        lastScrollTop: 0,
+      }
+    },
     components: {
       Profile
     },
     created() {
       this.$store.dispatch(at.changeStrategy);
-      this.$store.dispatch(at.appendToIgnoreList)
+      this.$store.dispatch(at.appendToIgnoreList);
+      if (this.$store.state.strategy === st.darkenOnScroll) {
+        window.addEventListener('scroll', this.darkenOnScrollListener)
+      }
     },
-    methods: {
-      open(uid) {
-          this.$store.dispatch(at.appendToIgnoreList, {items: [uid]});
-      },
-      show(uid) {
-        return show(this.strategy, !this.ignoreList.includes(uid));
-      },
-      seen(uid) {
-        const strategy = this.strategy === st.noop;
-        return this.ignoreList.includes(uid) && !strategy;
-      },
-      fetchNew: debounce(
-        function () {
-          const {currentUser} = this.$store.state;
-          if (currentUser) {
-            this.$store.dispatch(at.getNext, currentUser)
-          }
-        }, 400)
+    beforeDestroy() {
+      window.removeEventListener('scroll', this.darkenOnScrollListener)
     },
     computed: {
+      children() {
+        return this.$children[0].$children;
+      },
       strategy() {
         return this.$store.state.strategy;
       },
@@ -57,14 +59,53 @@
       }
     },
     watch: {
+      strategy(newStrategy, oldStrategy) {
+        addOrRemoveListener({
+          newStrategy,
+          oldStrategy,
+          cmpStrategy: st.darkenOnScroll,
+          listener: this.darkenOnScrollListener
+        });
+      },
       items(items, oldItems) {
         const diff = items.length - oldItems.length;
         const screenSizeIsNotChanged = items.pageLength === oldItems.pageLength;
         const notEnoughNewProfiles = isBottomOfPage() && (screenSizeIsNotChanged || diff < 5);
         if (notEnoughNewProfiles) {
-            this.fetchNew();
+          this.fetchNew();
         }
       }
+    },
+    methods: {
+      open(uid) {
+        this.$store.dispatch(at.appendToIgnoreList, {items: flatten([uid])});
+      },
+      seen(uid) {
+        const strategy = this.strategy === st.noop;
+        return this.ignoreList.includes(uid) && !strategy;
+      },
+      fetchNew: debounce(
+        function () {
+          const {currentUser} = this.$store.state;
+          if (currentUser) {
+            this.$store.dispatch(at.getNext, currentUser)
+          }
+        }, 400),
+      darkenOnScrollListener: debounce(
+        function () {
+          this.lastScrollTop = onScroll(this.lastScrollTop, () => {
+            if (this.children) {
+              const seenArray = this.children.reduce((newArray, child) => {
+                const uid = child.$props.profile.uid;
+                if (isElementHigher(child.$el) && uid) {
+                  newArray.push(uid);
+                }
+                return newArray;
+              }, []);
+              this.open(seenArray);
+            }
+          });
+        }, 300),
     }
   }
 </script>

@@ -12,7 +12,7 @@ Vue.use(Vuex);
 
 const state = {
   index: {},
-  strategy: st.darken,
+  strategy: st.darkenOnClick,
   ignoreList: [],
   fetchedGroupsLength: 0,
   profileList: [],

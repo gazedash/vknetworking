@@ -1,8 +1,8 @@
-import {elementInViewport} from "../utils/index";
+import {isElementInViewport} from "../utils/index";
 export default {
   bind (el, binding) {
     function lazyLoad(el, img) {
-      if (elementInViewport(el)) {
+      if (isElementInViewport(el)) {
         el.src = img.src;
       } else {
         setTimeout(() => {
