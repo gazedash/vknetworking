@@ -1,20 +1,17 @@
 <template>
-  <div class="root">
-    <div>
-      <a @click="open" @mouseenter="mouseOver(profile.uid)" @mouseleave="mouseLeave" :href="'https://vk.com/id' + profile.uid"
-         target="_blank">
-        <div :class="{ seen }">
-        </div>
-        <div class="image">
-          <!--@error-->
-          <img v-lazy="profile.photo_max"/>
-          <div v-if="activeId === profile.uid" class="name">
-            {{ profile.first_name }} {{ profile.last_name }}
-          </div>
-        </div>
-      </a>
+  <a class="root" @click="open" @mouseenter="mouseOver(profile.uid)" @mouseleave="mouseLeave"
+     :href="'https://vk.com/id' + profile.uid"
+     target="_blank">
+    <div :class="{ seen }">
     </div>
-  </div>
+    <div class="image">
+      <!--@error-->
+      <img v-lazy="profile.photo_max"/>
+      <div v-if="activeId === profile.uid" class="name">
+        {{ profile.first_name }} {{ profile.last_name }}
+      </div>
+    </div>
+  </a>
 </template>
 
 <script>
@@ -51,7 +48,7 @@
 
   .seen {
     position: absolute;
-    background: rgba(0,0,0,0.35);
+    background: rgba(0, 0, 0, 0.35);
     z-index: 0;
   }
 

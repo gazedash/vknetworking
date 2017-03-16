@@ -54,7 +54,7 @@
         dataSourceConfigCountry: {text: 'title', value: 'cid'},
         dataSourceConfigCity: {text: 'label', value: 'cid'},
         user,
-        sex: '1',
+        sex: '0',
         city: null,
         cityInput: null,
         country: null,

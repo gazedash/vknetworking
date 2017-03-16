@@ -3,9 +3,9 @@
     <mu-paper class="paper" :zDepth="1">
       <div class="list">
         <profile
-          v-for="p in list"
+          v-for="p in filteredList"
           :profile="p"
-          key="p.uid"
+          :key="p.uid"
           :seen="seen(p.uid)"
           @open="open"></profile>
       </div>
@@ -45,6 +45,9 @@
       window.removeEventListener('scroll', this.darkenOnScrollListener)
     },
     computed: {
+      filteredList () {
+        return this.list.filter((p) => !this.show(p.uid));
+      },
       children() {
         return this.$children[0].$children;
       },
@@ -80,6 +83,10 @@
       open(uid) {
         this.$store.dispatch(at.appendToIgnoreList, {items: flatten([uid])});
       },
+      show(uid) {
+        const strategy = this.strategy === st.hide;
+        return this.ignoreList.includes(uid) && strategy;
+      },
       seen(uid) {
         const strategy = this.strategy === st.noop;
         return this.ignoreList.includes(uid) && !strategy;
@@ -90,7 +97,7 @@
           if (currentUser) {
             this.$store.dispatch(at.getNext, currentUser)
           }
-        }, 400),
+        }, 200),
       darkenOnScrollListener: debounce(
         function () {
           this.lastScrollTop = onScroll(this.lastScrollTop, () => {
@@ -105,7 +112,7 @@
               this.open(seenArray);
             }
           });
-        }, 300),
+        }, 1000),
     }
   }
 </script>

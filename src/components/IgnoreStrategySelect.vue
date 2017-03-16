@@ -13,7 +13,7 @@
     props: {strategy: {default: st.darkenOnClick}},
     data () {
       return {
-        list: [st.noop, st.darkenOnClick, st.darkenOnScroll],
+        list: [st.noop, st.hide, st.darkenOnClick, st.darkenOnScroll],
       }
     },
     methods: {

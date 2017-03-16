@@ -95,18 +95,14 @@ const actions = {
     commit(mt.incrDebounceCounter);
     if (state.debounceCounter === 5) {
       commit(mt.clearDebounceCounter);
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          console.log('timeout');
-          resolve(true);
-        }, 1000);
-      })
-    } else return new Promise((resolve, reject) => setTimeout(() => resolve(true), 0))
+      return new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    return new Promise((resolve) => setTimeout(() => resolve(true), 0))
   },
   [at.getUser] ({commit, dispatch}, user_ids) {
-    return fetchUser({user_ids})
-      .then((items) => {
-        return dispatch(at.incrCheckAndWait).then(() => {
+    return dispatch(at.incrCheckAndWait).then(() => {
+      return fetchUser({user_ids})
+        .then((items) => {
           items.screen_name = user_ids;
           commit(mt.setUser, {items});
           if (items && items.uid) {
@@ -114,44 +110,44 @@ const actions = {
           }
           return items;
         })
-      });
+    });
   },
   [at.getCountries] ({commit, dispatch}, payload) {
-    return fetchCountries(payload)
-      .then((items) => {
-        return dispatch(at.incrCheckAndWait).then(() => {
+    return dispatch(at.incrCheckAndWait).then(() => {
+      return fetchCountries(payload)
+        .then((items) => {
           commit(mt.setCountries, {items, payload});
           return items;
         });
-      });
+    });
   },
   [at.getCities] ({commit, dispatch}, payload) {
-    return fetchCities(payload)
-      .then((items) => {
-        return dispatch(at.incrCheckAndWait).then(() => {
+    return dispatch(at.incrCheckAndWait).then(() => {
+      return fetchCities(payload)
+        .then((items) => {
           commit(mt.setCities, {items, country_id: payload.country_id});
           return items;
         });
-      });
+    });
   },
   [at.getGroupIdList] ({commit, dispatch}, user_id) {
-    return fetchGroups({user_id})
-      .then((items) => {
-        return dispatch(at.incrCheckAndWait).then(() => {
+    return dispatch(at.incrCheckAndWait).then(() => {
+      return fetchGroups({user_id})
+        .then((items) => {
           commit(mt.setGroupIdList, {items, user_id});
           return items;
         });
-      });
+    });
   },
   [at.getProfilesFromGroup] ({commit, dispatch}, payload) {
-    return fetchMembers(payload)
-      .then(items => {
-        return dispatch(at.incrCheckAndWait).then(() => {
+    return dispatch(at.incrCheckAndWait).then(() => {
+      return fetchMembers(payload)
+        .then(items => {
           commit(mt.setFetchedGroupsLength);
           commit(mt.setProfilesFromGroup, {items});
           return items;
         });
-      });
+    });
   },
   [at.getFirstNext] ({dispatch, commit, state}, payload) {
     return dispatch(at.getGroupIdList, payload.userId)
