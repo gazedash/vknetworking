@@ -8,4 +8,7 @@ export const getFirstNext = 'getFirstNext';
 export const getNext = 'getNext';
 export const clearProfileList = 'clearProfileList';
 export const appendToIgnoreList = 'appendToIgnoreList';
+export const clearIgnoreList = 'clearIgnoreList';
 export const changeStrategy = 'changeStrategy';
+export const getSettings = 'getSettings';
+export const setSettings = 'setSettings';

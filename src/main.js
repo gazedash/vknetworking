@@ -1,5 +1,6 @@
 import App from "./App";
 import Shell from "./containers/Shell";
+import Settings from "./containers/Settings";
 import Login from "./components/Login";
 import Vue from "vue";
 import store from "./store";
@@ -23,6 +24,7 @@ const router = new VueRouter({
   mode: 'history',
   routes: [
     { path: '/', component: Shell, beforeEnter: requireAuth },
+    { name: 'settings', path: '/settings', component: Settings, beforeEnter: requireAuth },
     { name: 'login', path: '/login', component: Login, beforeEnter: ifLoggedIn },
     { path: '/auth', beforeEnter: redirected },
   ]

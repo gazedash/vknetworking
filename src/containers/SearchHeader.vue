@@ -6,7 +6,8 @@
         <ignore-strategy-select :strategy="strategy" @change="changeStrategy"></ignore-strategy-select>
       </div>
       <div class="right" slot="right">
-        <clear-list-button @clear="clear" class="clear"></clear-list-button>
+        <settings-button @open="openSettings"></settings-button>
+        <clear-list-button @clear="clear"></clear-list-button>
         <logout></logout>
       </div>
     </app-header>
@@ -31,6 +32,7 @@
   import ClearListButton from '../components/ClearListButton'
   import SearchButton from '../components/SearchButton';
   import IgnoreStrategySelect from '../components/IgnoreStrategySelect';
+  import SettingsButton from '../components/SettingsButton';
   import SearchPopup from '../components/SearchPopup';
   import {isBottomOfPage} from "../utils/index";
   import debounce from 'lodash/debounce';
@@ -40,7 +42,7 @@
   import * as mt from "../store/mutationTypes";
   export default {
     name: 'search',
-    components: {AppHeader, SearchButton, SearchPopup, Logout, ClearListButton, IgnoreStrategySelect},
+    components: {AppHeader, SearchButton, SearchPopup, Logout, ClearListButton, IgnoreStrategySelect, SettingsButton},
     data () {
       return {
         cities: [],
@@ -141,7 +143,10 @@
       },
       changeStrategy(strategy) {
         this.$store.dispatch(at.changeStrategy, {strategy});
-      }
+      },
+      openSettings() {
+
+      },
     },
   }
 </script>

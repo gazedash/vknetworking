@@ -7,3 +7,4 @@ export const strategy = {
   darkenOnClick: 'on click',
   darkenOnScroll: 'on scroll',
 };
+export const resetConst = 'resetConst';

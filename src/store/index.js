@@ -6,7 +6,7 @@ import uniq from "lodash/uniq";
 import * as mt from "./mutationTypes";
 import * as at from "./actionTypes";
 import {get} from "../utils/storage";
-import {ignoreList, strategy as st} from "../const/index";
+import {ignoreList, strategy as st, resetConst} from "../const/index";
 
 Vue.use(Vuex);
 
@@ -23,6 +23,7 @@ const state = {
   users: {},
   currentUser: {},
   debounceCounter: 0,
+  settings: "",
 };
 
 // mutations are operations that actually mutates the state.
@@ -80,11 +81,17 @@ const mutations = {
     state.fetchedGroupsLength = 0;
     state.profileList = [];
   },
-  [mt.appendToStateIgnoreList] (state, {items}) {
+  [mt.setStateIgnoreList] (state, {items}) {
     state.ignoreList = items;
+  },
+  [mt.clearStateIgnoreList] (state) {
+    state.ignoreList = [];
   },
   [mt.changeStrategy] (state, {strategy}) {
     state.strategy = strategy;
+  },
+  [mt.setSettings] (state, {settings}) {
+    state.settings = settings;
   }
 };
 
@@ -185,7 +192,11 @@ const actions = {
     array = array && array.length ? array : [array];
     const res = uniq(items.concat(array));
     localStorage[name] = JSON.stringify(res);
-    commit(mt.appendToStateIgnoreList, {items: res});
+    commit(mt.setStateIgnoreList, {items: res});
+  },
+  [at.clearIgnoreList] ({commit}, {name = ignoreList} = {}) {
+    localStorage[name] = '{null}';
+    commit(mt.clearStateIgnoreList);
   },
   [at.changeStrategy] ({state, commit}, {strategy} = {}) {
     if (!strategy) {
@@ -195,6 +206,26 @@ const actions = {
       localStorage.strategy = strategy;
     }
     commit(mt.changeStrategy, {strategy});
+  },
+  [at.getSettings] ({commit}) {
+    const settings = btoa(JSON.stringify(localStorage));
+    commit(mt.setSettings, {settings});
+    return settings;
+  },
+  [at.setSettings] ({commit}, {settings}) {
+    if (settings) {
+      if (settings === resetConst) {
+        const token = localStorage.token;
+        localStorage.clear();
+        localStorage.token = token;
+        commit(mt.setSettings, {settings: ''});
+      } else {
+        const settingsStr = btoa(JSON.stringify(localStorage));
+        commit(mt.setSettings, {settings: settingsStr});
+        Object.entries(settings)
+          .forEach(([key, value]) => localStorage[key] = value)
+      }
+    }
   }
 };
 
