@@ -6,7 +6,7 @@ import _ from "lodash";
 function api_key() { return localStorage.token; }
 const endpoint = "https://api.vk.com";
 const OAuthEndpoint = "https://oauth.vk.com/authorize?";
-export const redirect_uri = "https://vknetworking-8c4dd.firebaseapp.com/auth";
+export const redirect_uri = "https://vk-networking.firebaseapp.com/auth";
 
 function baseMethod(method) {
   return `${endpoint}/method/${method}?access_token=${api_key()}`
