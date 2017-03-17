@@ -21,9 +21,8 @@ function paramsToString(params) {
 }
 
 export function buildGetMembersUrl(params) {
-  // sex=1: female
   console.log(baseMethod('users.search') + paramsToString(params) + '&count=1000&fields=photo_max,first_name,last_name&online=0');
-  return baseMethod('users.search') + paramsToString(params) + '&count=1000&fields=photo_max,first_name,last_name&online=0';
+  return baseMethod('users.search') + paramsToString(params) + '&count=1000&fields=photo_max,first_name,last_name&online=0&sort=0';
   // hometown?
 }
 
@@ -107,7 +106,7 @@ export function fetchCities({country_id = 1, q = "", need_all = 0, count = 100})
 
 export function fetchGroups({user_id}) {
   // return Promise.resolve(
-  //   JSON.parse("MOCK_DATA")
+  //   JSON.parse("[4325149,30666517,66170841,27211409,77270571,97408246,16466790,45454285,54530371,42013162,63066646,136372935,91933860,128481735,112005188,46638176,60684683,96047932,30775488,83547547,126188798,86905866,29740811,62625657,119425878,28076056,27667725,32465350,101522128,51236599,55614321,28302704,36315046,3967881,122776382,61440523,34616083,97689542,46495134,100401854,25616872,33603301,89558999,23995866,67256178,124116417,51216202,30597807,79473076,61226939,87771822,42523284,36326524,99215308,91304139,65688570,28457642,30619123,101541636,29537720,81956710,54319981,34724138,44955915,36837512,37615994,58267631,83776680,35634642,30321428,28636332,26929408,27683540,41057556,40520174,130654112,116863980,109302706,95589554,69843850,51592339,42020877,128188034,35052469,79138567,78863628,91635769,99198691,29591008,24578222,55098695,26356004,1672730,20629724,10839812,24507496,26071073,26140698,27711883,27801913,30078854,39687507,41016919,45994531,67528877]")
   // ).then(data => data);
   return fetchJsonp(buildGetSubscriptions({user_id}))
   .then(response => response.json())
@@ -129,7 +128,7 @@ function logError(json) {
   }
 }
 
-export function fetchMembers({q, group_id, country, city, sex = 0, age_from, age_to, hometown, has_photo}) {
+export function fetchMembers({q, group_id, country, city, sex = 0, age_from, age_to, hometown, has_photo = 1}) {
   return fetchJsonp(buildGetMembersUrl({q, country, group_id, city, sex, age_from, age_to, hometown, has_photo}))
     .then(response => response.json())
     .then(json => {

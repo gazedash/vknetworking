@@ -10,7 +10,9 @@
           @open="open"></profile>
       </div>
     </mu-paper>
-    <div class="stats">Groups: {{ size }} Profiles: {{ list.length }}</div>
+    <div class="stats">Groups: {{ size }} Profiles:
+      <span v-if="strategy === 'hide'">{{ filteredList.length }} / </span>
+      {{ list.length }}</div>
   </div>
 </template>
 
@@ -28,7 +30,7 @@
     props: ['list', 'size', 'ignoreList'],
     data () {
       return {
-        lastScrollTop: 0,
+        lastScrollTop: 0
       }
     },
     components: {
@@ -121,6 +123,7 @@
   .paper {
     display: block;
     padding: 0 0 10px 0;
+    margin-bottom: 10px;
   }
 
   .list {
@@ -130,6 +133,11 @@
   }
 
   .stats {
-    margin: 8px 0 8px 0;
+    background-color: #333;
+    color: #fff;
+    width: 100%;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
   }
 </style>

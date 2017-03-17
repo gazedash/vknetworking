@@ -153,6 +153,20 @@ const actions = {
         .then(items => {
           commit(mt.setFetchedGroupsLength);
           commit(mt.setProfilesFromGroup, {items});
+          if (items.length === 1000) {
+            dispatch(at.incrCheckAndWait).then(() => {
+              if (payload.offset) {
+                if (payload.offset === 1000 && payload.second !== true) {
+                  payload.offset = payload.offset + 1000;
+                }
+                payload.second = false;
+              } else {
+                payload.offset = 1000;
+                payload.second = true;
+              }
+              dispatch(at.getProfilesFromGroup, payload);
+            })
+          }
           return items;
         });
     });
