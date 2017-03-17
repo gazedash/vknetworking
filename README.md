@@ -1,6 +1,16 @@
 # VKNetworking
 
-> A Vue.js project
+> Web application to find new people with VK
+
+This project allows you to find people based on groups that you join in VK.com.
+It merges people from different groups, so you won't see duplicates.
+You can hide people that you already know, and hide as you scroll down.
+
+![VKNetworking](https://cloud.githubusercontent.com/assets/11088992/24039602/e0d50c4c-0b16-11e7-91cc-806a2270e6a7.png)
+![VKNetworking](https://cloud.githubusercontent.com/assets/11088992/24039601/e04580fe-0b16-11e7-8bc9-8bce63d96f14.png)
+![VKNetworking](https://cloud.githubusercontent.com/assets/11088992/24039604/e1b001e4-0b16-11e7-9890-ca3f631434ef.png)
+
+This project is based on [VK API](https://vk.com/dev) and it's built with [Vue.js](https://vuejs.org), [Muse-UI](https://museui.github.io) and [Vuex](https://github.com/vuejs/vuex).
 
 ## Build Setup
 
