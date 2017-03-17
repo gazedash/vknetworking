@@ -51,7 +51,8 @@ const mutations = {
     state.fetchedGroupsLength++;
   },
   [mt.setGroupIdList] (state, {items, user_id}) {
-    state.groupIdList[user_id] = uniq(items.concat(state.groupIdList[user_id]));
+    const groupIdList = state.groupIdList[user_id];
+    state.groupIdList[user_id] = uniq(items.concat(groupIdList ? groupIdList : []));
   },
   [mt.setProfilesFromGroup] (state, {items}) {
     state.profileList = uniqBy(state.profileList.concat(items), 'uid');

@@ -23,6 +23,7 @@ export default {
 <style scoped>
   .app-bar {
     z-index: 2;
+    background-color: #659ACE;
   }
   .home {
     text-align: center;

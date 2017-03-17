@@ -22,7 +22,7 @@ function paramsToString(params) {
 
 export function buildGetMembersUrl(params) {
   // sex=1: female
-  // console.log(baseMethod('users.search') + paramsToString(params) + '&count=1000&fields=photo_max,first_name,last_name&online=0');
+  console.log(baseMethod('users.search') + paramsToString(params) + '&count=1000&fields=photo_max,first_name,last_name&online=0');
   return baseMethod('users.search') + paramsToString(params) + '&count=1000&fields=photo_max,first_name,last_name&online=0';
   // hometown?
 }
@@ -38,7 +38,8 @@ export function buildGetCities(params) {
 
 export function buildGetSubscriptions(params) {
   // console.log(baseMethod('users.getSubscriptions') + paramsToString(params) + '&extended=0');
-  return baseMethod('users.getSubscriptions') + paramsToString(params) + '&extended=0';
+  // return baseMethod('users.getSubscriptions') + paramsToString(params) + '&extended=0';
+  return baseMethod('groups.get') + paramsToString(params) + '&extended=0';
 }
 
 export function buildGetCountriesByCode(params) {
@@ -112,8 +113,10 @@ export function fetchGroups({user_id}) {
   .then(response => response.json())
   .then(json => {
     logError(json);
+    console.log(json);
     if (json.response) {
-      const res = json.response.groups.items;
+      // const res = json.response.groups.items;
+      const res = json.response;
       return res ? res : [];
     }
     return [];
