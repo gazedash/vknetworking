@@ -1,6 +1,6 @@
 <template>
   <div>
-    <mu-paper class="paper" :zDepth="1">
+    <div class="paper" :zDepth="1">
       <div class="list">
         <profile
           v-for="p in filteredList"
@@ -9,7 +9,7 @@
           :seen="seen(p.uid)"
           @open="open"></profile>
       </div>
-    </mu-paper>
+    </div>
     <div class="stats">Groups: {{ size }} Profiles:
       <span v-if="strategy === 'hide'">{{ filteredList.length }} / </span>
       {{ list.length }}</div>

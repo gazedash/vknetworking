@@ -8,7 +8,6 @@
 <script>
   import SearchHeader from './SearchHeader'
   import ProfileList from './ProfileList'
-//  import {checkFirstTimeAndSet} from "../utils/auth";
 
   export default {
     name: 'shell',
