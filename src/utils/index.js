@@ -5,6 +5,18 @@ export function isBottomOfPage() {
   return (window.innerHeight + window.scrollY + 800) >= document.body.scrollHeight;
 }
 
+export function iterateWithDelay(array, cb, delay = 1000) {
+  let counter = 0;
+  let inter = setInterval(() => {
+    const items = array[counter];
+    cb(items);
+    counter++;
+    if (counter === array.length) {
+      clearInterval(inter);
+    }
+  }, delay);
+}
+
 export function show(strategy, cb) {
   switch (strategy) {
     case st.noop:
@@ -79,11 +91,11 @@ export function redirectToGetToken() {
 }
 
 export function createPopup({url = '', popupWidth = 655, popupHeight = 350}) {
-  const xPosition=(window.innerWidth-popupWidth)/2;
-  const yPosition=(window.innerHeight-popupHeight)/2;
-  return window.open(url, '_blank', "location=1,scrollbars=1,"+
-    "width="+popupWidth+",height="+popupHeight+","+
-    "left="+xPosition+",top="+yPosition);
+  const xPosition = (window.innerWidth - popupWidth) / 2;
+  const yPosition = (window.innerHeight - popupHeight) / 2;
+  return window.open(url, '_blank', "location=1,scrollbars=1," +
+    "width=" + popupWidth + ",height=" + popupHeight + "," +
+    "left=" + xPosition + ",top=" + yPosition);
 }
 
 export function createSignInPopup() {
@@ -92,7 +104,7 @@ export function createSignInPopup() {
 
 export function onScroll(delta = 0, downCb = function() {}, upCb = function() {}) {
   const st = window.pageYOffset || document.documentElement.scrollTop;
-  if (st > delta){
+  if (st > delta) {
     downCb();
     // downscroll code
   } else {

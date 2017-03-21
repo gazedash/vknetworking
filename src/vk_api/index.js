@@ -6,6 +6,8 @@ import _ from "lodash";
 function api_key() { return localStorage.token; }
 const endpoint = "https://api.vk.com";
 const OAuthEndpoint = "https://oauth.vk.com/authorize?";
+const profileFields = 'fields=photo_max,first_name,last_name';
+const countAndOnline = 'count=1000&online=0';
 export const redirect_uri = "https://vk-networking.firebaseapp.com/auth";
 
 function baseMethod(method) {
@@ -21,8 +23,8 @@ function paramsToString(params) {
 }
 
 export function buildGetMembersUrl(params) {
-  console.log(baseMethod('users.search') + paramsToString(params) + '&count=1000&fields=photo_max,first_name,last_name&online=0');
-  return baseMethod('users.search') + paramsToString(params) + '&count=1000&fields=photo_max,first_name,last_name&online=0&sort=0';
+  console.log(baseMethod('users.search') + paramsToString(params) + `${countAndOnline}&` + profileFields);
+  return baseMethod('users.search') + paramsToString(params) + `${countAndOnline}&sort=0&` + profileFields;
   // hometown?
 }
 
@@ -38,7 +40,39 @@ export function buildGetCities(params) {
 export function buildGetSubscriptions(params) {
   // console.log(baseMethod('users.getSubscriptions') + paramsToString(params) + '&extended=0');
   // return baseMethod('users.getSubscriptions') + paramsToString(params) + '&extended=0';
-  return baseMethod('groups.get') + paramsToString(params) + '&extended=0';
+  return baseMethod('groups.get') + paramsToString(params);
+}
+
+export function buildGetMembers(params) {
+  // filter=friends
+  console.log(baseMethod('groups.getMembers') + paramsToString(params) + `&${profileFields}`);
+  return baseMethod('groups.getMembers') + paramsToString(params) + `&${profileFields}`
+}
+
+export function buildGroupById(params) {
+  return baseMethod('groups.getById') + paramsToString(params) + '&fields=name,photo'
+}
+
+export function executeGetFriends(testData) {
+  const s = 'var f=\"photo_50,first_name,last_name\";return[';
+  let loop = testData.map(id => {
+    return `[${id},API.groups.getMembers({\"group_id\":${id},\"filter\":\"friends\",\"fields\":f})]`
+  });
+  const e = "];";
+  return execute(s + loop + e);
+}
+
+export function executeGetGroupInfo(testData) {
+  const c = 'var gr=\"name,photo\";return[';
+  let loop = testData.map(id => {
+    return `API.groups.getById({\"group_id\":${id},\"fields\":gr})`
+  });
+  const e = "];";
+  return execute(c + loop + e);
+}
+
+export function execute(code) {
+  return baseMethod('execute') + "&code=" + encodeURI(code);
 }
 
 export function buildGetCountriesByCode(params) {
@@ -49,6 +83,10 @@ export function buildGetCountriesByCode(params) {
 export function buildGetUser(params) {
   // console.log(baseMethod('users.get') + paramsToString(params));
   return baseMethod('users.get') + paramsToString(params);
+}
+
+export function buildFriendsGet(params) {
+  return baseMethod('friends.get') + paramsToString(params) + '&count=10000'
 }
 
 export function buildVkAuthUrl({scope = "groups", display = "page", v = "5.626", response_type = "token"}) {
@@ -69,11 +107,58 @@ export function fetchUser({user_ids}) {
     .then(response => response.json())
     .then(json => {
       logError(json);
+      return json.response ? json.response[0] : [];
+    });
+}
+
+export function fetchGroupById(params) {
+  // group_id, groups_id
+  return fetchJsonp(buildGroupById(params))
+    .then(response => response.json())
+    .then(json => {
+      logError(json);
+      return json.response ? json.response : [];
+    });
+}
+
+export function fetchExecuteGetFriendsInGroup({items}) {
+  return fetchJsonp(executeGetFriends(items))
+    .then(response => response.json())
+    .then(json => {
+      logError(json);
+      return json.response ? json.response : [];
+    });
+}
+
+export function fetchExecuteGetGroupInfo({items}) {
+  return fetchJsonp(executeGetGroupInfo(items))
+    .then(response => response.json())
+    .then(json => {
+      logError(json);
+      return json.response ? json.response : [];
+    });
+}
+
+export function fetchFriends({user_id}) {
+  return fetchJsonp(buildFriendsGet({user_id}))
+    .then(response => response.json())
+    .then(json => {
+      logError(json);
+      return json.response ? json.response : [];
+    })
+}
+
+export function fetchGroupMembers({group_id, filter}) {
+  return fetchJsonp(buildGetMembers({group_id, filter}))
+    .then(response => response.json())
+    .then(json => {
+      logError(json);
       if (json.response) {
-        return json.response[0];
+        const {items} = json.response;
+        return items ? items : [];
       }
       return [];
-    });
+    })
 }
 
 export function fetchCountries({code = null} = {}) {
@@ -81,10 +166,7 @@ export function fetchCountries({code = null} = {}) {
     .then(response => response.json())
     .then(json => {
       logError(json);
-      if (json.response) {
-        return json.response;
-      }
-      return _.toArray(json);
+      return json.response ? json.response : _.toArray(json);
     });
 }
 
@@ -97,29 +179,20 @@ export function fetchCities({country_id = 1, q = "", need_all = 0, count = 100})
     .then(response => response.json())
     .then(json => {
       logError(json);
-      if (json.response) {
-        return json.response;
-      }
-      return [];
+      return json.response ? json.response : [];
     });
 }
 
 export function fetchGroups({user_id}) {
   // return Promise.resolve(
-  //   JSON.parse("[4325149,30666517,66170841,27211409,77270571,97408246,16466790,45454285,54530371,42013162,63066646,136372935,91933860,128481735,112005188,46638176,60684683,96047932,30775488,83547547,126188798,86905866,29740811,62625657,119425878,28076056,27667725,32465350,101522128,51236599,55614321,28302704,36315046,3967881,122776382,61440523,34616083,97689542,46495134,100401854,25616872,33603301,89558999,23995866,67256178,124116417,51216202,30597807,79473076,61226939,87771822,42523284,36326524,99215308,91304139,65688570,28457642,30619123,101541636,29537720,81956710,54319981,34724138,44955915,36837512,37615994,58267631,83776680,35634642,30321428,28636332,26929408,27683540,41057556,40520174,130654112,116863980,109302706,95589554,69843850,51592339,42020877,128188034,35052469,79138567,78863628,91635769,99198691,29591008,24578222,55098695,26356004,1672730,20629724,10839812,24507496,26071073,26140698,27711883,27801913,30078854,39687507,41016919,45994531,67528877]")
+  //   JSON.parse("[0]")
   // ).then(data => data);
   return fetchJsonp(buildGetSubscriptions({user_id}))
-  .then(response => response.json())
-  .then(json => {
-    logError(json);
-    console.log(json);
-    if (json.response) {
-      // const res = json.response.groups.items;
-      const res = json.response;
-      return res ? res : [];
-    }
-    return [];
-  });
+    .then(response => response.json())
+    .then(json => {
+      logError(json);
+      return json.response ? json.response : [];
+    });
 }
 
 function logError(json) {
@@ -128,12 +201,24 @@ function logError(json) {
   }
 }
 
-export function fetchMembers({q, group_id, country, city, sex = 0, age_from, age_to, hometown, has_photo = 1}) {
-  return fetchJsonp(buildGetMembersUrl({q, country, group_id, city, sex, age_from, age_to, hometown, has_photo}))
+export function fetchMembers({q, group_id, offset = 0, country, city, sex = 0, age_from, age_to, hometown, has_photo = 1}) {
+  return fetchJsonp(buildGetMembersUrl({
+    q,
+    offset,
+    country,
+    group_id,
+    city,
+    sex,
+    age_from,
+    age_to,
+    hometown,
+    has_photo
+  }))
     .then(response => response.json())
     .then(json => {
       logError(json);
       if (json.response) {
+        json.response.count = json.response[0];
         json.response.shift();
         return json.response;
       }

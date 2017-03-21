@@ -6,7 +6,8 @@
         <ignore-strategy-select :strategy="strategy" @change="changeStrategy"></ignore-strategy-select>
       </div>
       <div class="right" slot="right">
-        <settings-button @open="openSettings"></settings-button>
+        <groups-button></groups-button>
+        <settings-button></settings-button>
         <clear-list-button @clear="clear"></clear-list-button>
         <logout></logout>
       </div>
@@ -31,6 +32,7 @@
   import Logout from '../components/Logout';
   import ClearListButton from '../components/ClearListButton'
   import SearchButton from '../components/SearchButton';
+  import GroupsButton from '../components/GroupsButton';
   import IgnoreStrategySelect from '../components/IgnoreStrategySelect';
   import SettingsButton from '../components/SettingsButton';
   import SearchPopup from '../components/SearchPopup';
@@ -42,7 +44,10 @@
   import * as mt from "../store/mutationTypes";
   export default {
     name: 'search',
-    components: {AppHeader, SearchButton, SearchPopup, Logout, ClearListButton, IgnoreStrategySelect, SettingsButton},
+    components: {
+      AppHeader, SearchButton, SearchPopup, Logout,
+      ClearListButton, IgnoreStrategySelect, SettingsButton, GroupsButton
+    },
     data () {
       return {
         cities: [],
@@ -125,27 +130,20 @@
       onSubmit(data) {
         data ? this.searchData = data : data = this.searchData;
         this.close('top');
-        // If profileLink...
-        let userId = getUserName(data.profileLink);
-        if (Number.isInteger(userId)) {
-          this.finallyFetch({...data, userId});
+        const fetchData = (data, userId) => this.finallyFetch({...data, userId});
+        const userId = this.$store.getters.getUserId(data.profileLink);
+        if (userId) {
+          fetchData(data, userId);
         } else {
-          let storedUserId = this.$store.getters.getStoredUserId(userId);
-          if (storedUserId) {
-            this.finallyFetch({...data, userId: storedUserId});
-          } else this.$store.dispatch(at.getUser, userId).then((user) => {
-            this.finallyFetch({...data, userId: user.uid});
-          })
+          let userId = data.profileLink;
+          this.$store.dispatch(at.getUser, userId).then((user) => fetchData(data, user.uid))
         }
       },
       clear() {
-          this.$store.dispatch(at.clearProfileList);
+        this.$store.dispatch(at.clearProfileList);
       },
       changeStrategy(strategy) {
         this.$store.dispatch(at.changeStrategy, {strategy});
-      },
-      openSettings() {
-
       },
     },
   }
