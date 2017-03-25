@@ -1,14 +1,13 @@
 <template>
-  <a class="root" @click="open" @mouseenter="mouseOver(profile.uid)" @mouseleave="mouseLeave"
-     :href="'https://vk.com/id' + profile.uid"
+  <a class="root" @click="open" @mouseenter="mouseOver(item.uid)" @mouseleave="mouseLeave"
+     :href="'https://vk.com/id' + item.uid"
      target="_blank">
-    <div :class="{ seen }">
+    <div :class="[ seen ? 'seen ' + size : '' ]">
     </div>
     <div class="image">
-      <!--@error-->
-      <img v-lazy="profile.photo_max"/>
-      <div v-if="activeId === profile.uid" class="name">
-        {{ profile.first_name }} {{ profile.last_name }}
+      <img :class="size" v-lazy="item.photo_max"/>
+      <div v-if="activeId === item.uid" :class="'name ' + size + '_name'">
+        {{ item.first_name }} {{ item.last_name }}
       </div>
     </div>
   </a>
@@ -18,25 +17,26 @@
   export default {
     name: 'profile',
     props: {
-      profile: {type: Object, required: true},
-      seen: {type: Boolean, default: false}
+      item: { type: Object, required: true },
+      seen: { type: Boolean, default: false },
+      size: { type: String, default: 'small' },
     },
     data () {
       return {
         activeId: null,
-      }
+      };
     },
     methods: {
       open() {
-        this.$emit('open', this.profile.uid)
+        this.$emit('open', this.item.uid);
       },
       mouseOver(id) {
         this.activeId = id;
       },
       mouseLeave() {
         this.activeId = null;
-      }
-    }
+      },
+    },
   }
 </script>
 
@@ -45,6 +45,11 @@
     /*box-shadow: 0 27px 55px 0 rgba(0, 0, 0, 0.1), 0 7px 12px 0 rgba(0, 0, 0, 0.10);*/
     background-color: #fafafa;
   }
+  a {
+    display: block;
+    text-decoration: none;
+    color: black;
+  }
 
   .seen {
     position: absolute;
@@ -52,28 +57,12 @@
     z-index: 0;
   }
 
-  .seen, img {
-    height: 200px;
-    width: 200px;
-  }
-
-  a {
-    display: block;
-    text-decoration: none;
-    color: black;
-  }
-
-  .image {
-    z-index: 0;
-    display: flex;
-    justify-content: center;
-  }
-
+  /*small*/
   .name {
     background-color: rgba(0, 0, 0, 0.25);
     color: #fff;
     position: absolute;
-    margin-top: 12.1em;
+    margin-top: 169px;
     z-index: 1;
     width: 200px;
     overflow: hidden;
@@ -81,55 +70,58 @@
     text-align: center;
   }
 
-  @media screen and (max-width: 360px) {
-    .seen, img {
-      height: 100px;
-      width: 100px;
-    }
-
-    .name {
-      word-break: keep-all;
-      overflow: hidden;
-      font-size: 10px;
-      padding: 2px 0 2px 0;
-      margin-top: 6em;
-      width: 100px;
-    }
+  .extra-small {
+    height: 100px;
+    width: 100px;
   }
 
-  @media screen and (min-width: 1220px) {
-    .seen, img {
-      height: 240px;
-      width: 240px;
-    }
-
-    .name {
-      margin-top: 14.9em;
-      width: 240px;
-    }
+  .extra-small_name {
+    word-break: keep-all;
+    overflow: hidden;
+    font-size: 10px;
+    padding: 2px 0 2px 0;
+    margin-top: 66px;
+    width: 100px;
   }
 
-  @media screen and (min-width: 1440px) {
-    .seen, img {
-      height: 260px;
-      width: 260px;
-    }
-
-    .name {
-      margin-top: 16.35em;
-      width: 260px;
-    }
+  .small {
+    height: 200px;
+    width: 200px;
   }
 
-  @media screen and (min-width: 1570px) {
-    .seen, img {
-      height: 280px;
-      width: 280px;
-    }
+  .medium {
+    height: 240px;
+    width: 240px;
+  }
 
-    .name {
-      margin-top: 17.8em;
-      width: 280px;
-    }
+  .medium_name {
+    margin-top: 210px;
+    width: 240px;
+  }
+
+  .large {
+    height: 260px;
+    width: 260px;
+  }
+
+  .large_name {
+    margin-top: 229px;
+    width: 260px;
+  }
+
+  .extra-large {
+    height: 280px;
+    width: 280px;
+  }
+
+  .extra-large_name {
+    margin-top: 249px;
+    width: 280px;
+  }
+
+  .image {
+    z-index: 0;
+    display: flex;
+    justify-content: center;
   }
 </style>

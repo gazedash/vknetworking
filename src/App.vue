@@ -10,5 +10,13 @@
   };
 </script>
 
-<style scoped>
+<style>
+  .mu-dropDown-menu-text-overflow {
+    color: #fff;
+  }
+  .profile-list {
+    display: inline-flex;
+    justify-content: center;
+    flex-flow: row wrap;
+  }
 </style>

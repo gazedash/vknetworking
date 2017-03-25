@@ -2,27 +2,39 @@
   <div>
     <div class="paper" :zDepth="1">
       <div class="list">
-        <profile
-          v-for="p in filteredList"
-          :profile="p"
-          :key="p.uid"
-          :seen="seen(p.uid)"
-          @open="open"></profile>
+        <virtual-scroller
+          :pageMode="true"
+          contentClass="profile-list"
+          class="scroller"
+          :items="splitFilteredList"
+          :item-height="height('pixels')">
+          <template scope="props">
+            <profile
+              v-for="item in props.item"
+              :item="item"
+              :size="height('name')"
+              :seen="seen(item.uid)"
+              :key="item.uid"
+              @open="open"
+            ></profile>
+          </template>
+        </virtual-scroller>
       </div>
     </div>
     <div class="stats">Groups: {{ size }} Profiles:
       <span v-if="strategy === 'hide'">{{ filteredList.length }} / </span>
-      {{ list.length }}</div>
+      <span>{{ list.length }}</span>
+    </div>
   </div>
 </template>
 
 <script>
   import Profile from '../components/Profile'
-  import {isBottomOfPage, show, isElementHigher, addOrRemoveListener} from "../utils/index"
+  import { isBottomOfPage, isElementHigher, addOrRemoveListener, mediaQueryWidth } from '../utils/index';
   import debounce from 'lodash/debounce'
   import * as at from "../store/actionTypes"
-  import {strategy as st} from "../const/index"
-  import {onScroll} from '../utils'
+  import { strategy as st } from "../const/index"
+  import { onScroll } from '../utils'
   import flatten from 'lodash/flatten';
 
   export default {
@@ -30,25 +42,36 @@
     props: ['list', 'size', 'ignoreList'],
     data () {
       return {
-        lastScrollTop: 0
-      }
+        lastScrollTop: 0,
+        length: 4,
+      };
     },
     components: {
-      Profile
+      Profile,
+    },
+    mounted() {
+      window.addEventListener('resize', this.handleWindowResize);
     },
     created() {
       this.$store.dispatch(at.changeStrategy);
       this.$store.dispatch(at.appendToIgnoreList);
       if (this.$store.state.strategy === st.darkenOnScroll) {
-        window.addEventListener('scroll', this.darkenOnScrollListener)
+        window.addEventListener('scroll', this.darkenOnScrollListener);
       }
     },
     beforeDestroy() {
-      window.removeEventListener('scroll', this.darkenOnScrollListener)
+      window.removeEventListener('resize', this.handleWindowResize);
+      window.removeEventListener('scroll', this.darkenOnScrollListener);
     },
     computed: {
+      splitFilteredList () {
+        return _.chunk(this.filteredList, this.length);
+      },
       filteredList () {
-        return this.list.filter((p) => !this.show(p.uid));
+        if (this.strategy === st.hide) {
+          return this.list.filter((p) => !this.show(p.uid));
+        }
+        return this.list;
       },
       children() {
         return this.$children[0].$children;
@@ -72,18 +95,25 @@
           listener: this.darkenOnScrollListener
         });
       },
-      items(items, oldItems) {
+      items: debounce(function(items, oldItems) {
         const diff = items.length - oldItems.length;
         const screenSizeIsNotChanged = items.pageLength === oldItems.pageLength;
         const notEnoughNewProfiles = isBottomOfPage() && (screenSizeIsNotChanged || diff < 5);
         if (notEnoughNewProfiles) {
           this.fetchNew();
         }
-      }
+      }, 500),
     },
     methods: {
+      handleWindowResize() {
+        this.length = this.height('length');
+      },
+      height(value) {
+          console.log(mediaQueryWidth());
+        return mediaQueryWidth()[value];
+      },
       open(uid) {
-        this.$store.dispatch(at.appendToIgnoreList, {items: flatten([uid])});
+        this.$store.dispatch(at.appendToIgnoreList, { items: flatten([uid]) });
       },
       show(uid) {
         const strategy = this.strategy === st.hide;
@@ -94,14 +124,14 @@
         return this.ignoreList.includes(uid) && !strategy;
       },
       fetchNew: debounce(
-        function () {
-          const {currentUser} = this.$store.state;
+        function() {
+          const { currentUser } = this.$store.state;
           if (currentUser) {
             this.$store.dispatch(at.getNext, currentUser)
           }
         }, 200),
       darkenOnScrollListener: debounce(
-        function () {
+        function() {
           this.lastScrollTop = onScroll(this.lastScrollTop, () => {
             if (this.children) {
               const seenArray = this.children.reduce((newArray, child) => {
@@ -115,8 +145,8 @@
             }
           });
         }, 1000),
-    }
-  }
+    },
+  };
 </script>
 
 <style scoped>
