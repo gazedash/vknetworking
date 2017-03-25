@@ -1,16 +1,16 @@
 <template>
   <div class="root">
     <a class="link logo"
-       :href="'https://vk.com/public' + group.info.gid"
+       :href="'https://vk.com/public' + item.info.gid"
        target="_blank">
-      <img class="group-icon" v-lazy="group.info.photo"/>
-      <svg v-if="group.info.is_member" style="width:24px;height:24px" viewBox="0 0 24 24">
+      <img class="group-icon" v-lazy="item.info.photo"/>
+      <svg v-if="item.info.is_member" style="width:24px;height:24px" viewBox="0 0 24 24">
         <path fill="#000000" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
       </svg>
-      <div class="title">{{ group.info.name }}</div>
+      <div class="title">{{ item.info.name }}</div>
     </a>
     <div class="members">
-      <a class="link" v-for="friend in group.data"
+      <a class="link" v-for="friend in item.data"
          :href="'https://vk.com/id' + friend.uid"
          target="_blank">
         <img class="image" :title="friend.first_name + ' ' + friend.last_name" v-lazy="returnPhoto(friend)"/>
@@ -23,22 +23,22 @@
   export default {
     name: 'group',
     props: {
-      group: {type: Object, required: true},
+      item: { type: Object, required: true },
     },
     data () {
       return {
 //        activeId: null,
-      }
+      };
     },
     methods: {
 //      open() {
-//        this.$emit('open', this.group.uid)
+//        this.$emit('open', this.item.uid)
 //      },
       returnPhoto (friend) {
         return friend.photo_50;
       },
-    }
-  }
+    },
+  };
 </script>
 
 <style scoped>

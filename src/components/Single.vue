@@ -20,22 +20,22 @@
   export default {
     name: 'single',
     props: {
-      single: {type: Object, required: true},
+      item: { type: Object, required: true },
     },
     computed: {
       user() {
-        return this.single.user;
+        return this.item.user;
       },
       groups () {
-        return this.single.groups;
-      }
+        return this.item.groups;
+      },
     },
     methods: {
       returnPhoto (friend) {
         return friend.photo_50;
       },
-    }
-  }
+    },
+  };
 </script>
 
 <style scoped>

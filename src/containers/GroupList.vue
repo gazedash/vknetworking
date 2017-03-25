@@ -1,14 +1,13 @@
 <template>
   <div>
     <group
-      v-for="group, id in filteredList"
-      :group="group"
+      v-for="item, id in filteredList"
+      :item="item"
       :key="id"
     ></group>
-    <div class="stats">Groups: {{ size }} Profiles:
-      <span>{{ filteredList.length }} / </span>
-      {{ list.length }}
-      <single v-for="s, id in singles" :key="id" :single="s"></single>
+    <div class="stats">Groups: {{ size }} Friends:
+      <span>{{ list.length }}</span>
+      <single v-for="s, id in singles" :key="id" :item="s"></single>
     </div>
   </div>
 </template>
@@ -18,7 +17,6 @@
   import Single from '../components/Single'
   import * as at from "../store/actionTypes"
   import _ from 'lodash';
-  import {isBottomOfPage} from "../utils/index";
 
   export default {
     name: 'group-list',
@@ -26,7 +24,7 @@
     data () {
       return {
 //        lastScrollTop: 0
-      }
+      };
     },
     components: {
       Group, Single
@@ -42,7 +40,7 @@
         return {
           length: this.filteredList.length,
           pageLength: document.documentElement.scrollHeight
-        }
+        };
       },
     },
     methods: {
