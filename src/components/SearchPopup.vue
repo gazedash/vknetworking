@@ -44,15 +44,15 @@
   import Welcome from './Welcome';
   import ResetButton from './ResetButton';
   import MyPopup from './MyPopup';
-  import {user, setDoNotShowAgain} from '../utils/auth';
+  import { user, setDoNotShowAgain } from '../utils/auth';
   import _ from 'lodash';
   import countries from "i18n-iso-countries";
   export default {
     name: 'search-popup',
     data () {
       return {
-        dataSourceConfigCountry: {text: 'title', value: 'cid'},
-        dataSourceConfigCity: {text: 'label', value: 'cid'},
+        dataSourceConfigCountry: { text: 'title', value: 'cid' },
+        dataSourceConfigCity: { text: 'label', value: 'cid' },
         user,
         sex: '0',
         city: null,
@@ -66,7 +66,7 @@
         filterSource (searchText, key) {
           return key.includes(searchText);
         },
-      }
+      };
     },
     props: {
       open: {
@@ -138,7 +138,7 @@
         } else {
           const code = countries.getAlpha2Code(country, 'en');
           if (code) {
-            this.$emit('getCountryByCode', {code, country});
+            this.$emit('getCountryByCode', { code, country });
           }
         }
       },
@@ -150,7 +150,7 @@
         } else {
           const country = this.countryInput || this.country;
           const code = countries.getAlpha2Code(country, 'en');
-          this.$emit('getCityByQuery', {city, code, country: this.country, countryInput: this.countryInput});
+          this.$emit('getCityByQuery', { city, code, country: this.country, countryInput: this.countryInput });
         }
       },
       handleChange (country) {
@@ -171,12 +171,12 @@
         );
       },
     },
-    components: {Welcome, ResetButton, MyPopup},
+    components: { Welcome, ResetButton, MyPopup },
   }
 </script>
 
 <style scoped>
   .paper {
-  padding: 14px 25px 14px 25px;
+    padding: 14px 25px 14px 25px;
   }
 </style>

@@ -12,8 +12,8 @@
     name: 'groups-button',
     methods: {
       open() {
-        this.$router.push({name: 'groups'});
-      }
-    }
-  }
+        this.$router.push({ name: 'groups' });
+      },
+    },
+  };
 </script>

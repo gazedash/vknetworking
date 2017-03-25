@@ -15,9 +15,9 @@
 </template>
 
 <script>
-export default {
+  export default {
     name: 'app-header',
-}
+  };
 </script>
 
 <style scoped>
@@ -25,9 +25,11 @@ export default {
     z-index: 2;
     background-color: #659ACE;
   }
+
   .home {
     text-align: center;
   }
+
   .home > a {
     color: #fff;
   }

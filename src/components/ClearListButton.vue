@@ -11,10 +11,10 @@
     name: 'clear-list-button',
     methods: {
       clear() {
-        this.$emit('clear')
-      }
-    }
-  }
+        this.$emit('clear');
+      },
+    },
+  };
 </script>
 
 <style scoped>

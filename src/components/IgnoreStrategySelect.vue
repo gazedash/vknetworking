@@ -7,37 +7,37 @@
 </template>
 
 <script>
-  import {strategy as st} from "../const/index";
+  import { strategy as st } from '../const/index';
+
   export default {
     name: 'ignore-strategy-select',
-    props: {strategy: {default: st.darkenOnClick}},
+    props: { strategy: { default: st.darkenOnClick } },
     data () {
       return {
         list: [st.noop, st.hide, st.darkenOnClick, st.darkenOnScroll],
-      }
+      };
     },
     methods: {
-        change(e) {
-            this.$emit('change', e);
-        }
-    }
-  }
+      change(e) {
+        this.$emit('change', e);
+      },
+    },
+  };
 </script>
 
-<style>
+<style scope>
   .root {
     display: flex;
     align-items: center;
   }
+
   .select {
     width: 120px !important;
     min-height: 0 !important;
     margin: 0 !important;
   }
+
   .select > div {
     padding: 0;
-  }
-  .mu-dropDown-menu-text-overflow {
-    color: #fff;
   }
 </style>
