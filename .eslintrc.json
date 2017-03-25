@@ -1,0 +1,13 @@
+{
+  "parser": "babel-eslint",
+  "extends": ["vue", "airbnb-base"],
+  "plugins": [
+    "vue",
+    "flowtype",
+    "import",
+    "html"
+  ],
+  "rules": {
+    "flowtype/define-flow-type": 1
+  }
+}
