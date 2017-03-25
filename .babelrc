@@ -11,11 +11,15 @@
   "plugins": [
     "transform-runtime",
     "syntax-flow",
-    "tcomb",
     "transform-flow-strip-types"
   ],
   "comments": false,
   "env": {
+    "development": {
+      "plugins": [
+        "tcomb"
+      ]
+    },
     "test": {
       "plugins": [
         "istanbul"
