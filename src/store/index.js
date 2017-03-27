@@ -188,8 +188,7 @@ const actions = {
       }));
   },
   [at.getGroupIdListNoCommit]({ dispatch }, { user_id }) {
-    return dispatch(at.incrCheckAndWait).then(() => fetchGroups({ user_id })
-      .then(items => items));
+    return dispatch(at.incrCheckAndWait).then(() => fetchGroups({ user_id }));
   },
   [at.getProfilesFromGroup]({ commit, dispatch }, payload) {
     return dispatch(at.incrCheckAndWait).then(() => fetchMembers(payload)
