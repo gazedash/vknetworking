@@ -2,7 +2,7 @@
   <a class="root" @click="open" @mouseenter="mouseOver(item.uid)" @mouseleave="mouseLeave"
      :href="'https://vk.com/id' + item.uid"
      target="_blank">
-    <div :class="[ seen ? 'seen ' + size : '' ]">
+    <div :class="[ item.seen ? 'seen ' + size : '' ]">
     </div>
     <div class="image">
       <img :class="size" v-lazy="item.photo_max"/>
@@ -18,7 +18,7 @@
     name: 'profile',
     props: {
       item: { type: Object, required: true },
-      seen: { type: Boolean, default: false },
+//      seen: { type: Boolean, default: false },
       size: { type: String, default: 'small' },
     },
     data () {

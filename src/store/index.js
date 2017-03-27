@@ -180,14 +180,14 @@ const actions = {
         return items;
       }));
   },
-  [at.getGroupIdList]({ commit, dispatch }, user_id) {
+  [at.getGroupIdList]({ commit, dispatch }, { user_id }) {
     return dispatch(at.incrCheckAndWait).then(() => fetchGroups({ user_id })
       .then((items) => {
         commit(mt.setGroupIdList, { items, user_id });
         return items;
       }));
   },
-  [at.getGroupIdListNoCommit]({ dispatch }, user_id) {
+  [at.getGroupIdListNoCommit]({ dispatch }, { user_id }) {
     return dispatch(at.incrCheckAndWait).then(() => fetchGroups({ user_id })
       .then(items => items));
   },
@@ -214,9 +214,8 @@ const actions = {
       }));
   },
   [at.getFirstNext]({ dispatch, commit, state }, payload) {
-    return dispatch(at.getGroupIdList, payload.user_id)
-    // return actions.getGroupIdList({ commit }, payload.user_id)
-      .then(items => actions.getNext({ dispatch, commit, state }, { items, ...payload }));
+    return dispatch(at.getGroupIdList, { user_id: payload.user_id })
+      .then(items => dispatch(at.getNext, { items, ...payload }));
   },
   [at.getNext]({ dispatch, commit, state }, { items, ...payload }) {
     // payload is options for profile searching

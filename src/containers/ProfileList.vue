@@ -6,6 +6,7 @@
           :pageMode="true"
           contentClass="profile-list"
           class="scroller"
+          ref="vueVirtualScroller"
           :items="splitFilteredList"
           :item-height="height('pixels')">
           <template scope="props">
@@ -13,7 +14,6 @@
               v-for="item in props.item"
               :item="item"
               :size="height('name')"
-              :seen="seen(item.uid)"
               :key="item.uid"
               @open="open"
             ></profile>
@@ -22,7 +22,7 @@
       </div>
     </div>
     <div class="stats">Groups: {{ size }} Profiles:
-      <span v-if="strategy === 'hide'">{{ filteredList.length }} / </span>
+      <span v-if="strategy === 'hide'">{{ splitFilteredList.length * this.length }} / </span>
       <span>{{ list.length }}</span>
     </div>
   </div>
@@ -35,7 +35,7 @@
   import * as at from "../store/actionTypes"
   import { strategy as st } from "../const/index"
   import { onScroll } from '../utils'
-  import flatten from 'lodash/flatten';
+  import { flatten, findLast, differenceWith } from 'lodash';
 
   export default {
     name: 'profile-list',
@@ -53,6 +53,7 @@
       window.addEventListener('resize', this.handleWindowResize);
     },
     created() {
+      this.handleWindowResize();
       this.$store.dispatch(at.changeStrategy);
       this.$store.dispatch(at.appendToIgnoreList);
       if (this.$store.state.strategy === st.darkenOnScroll) {
@@ -65,16 +66,14 @@
     },
     computed: {
       splitFilteredList () {
-        return _.chunk(this.filteredList, this.length);
-      },
-      filteredList () {
+        let list = this.list;
         if (this.strategy === st.hide) {
-          return this.list.filter((p) => !this.show(p.uid));
+          list = differenceWith(list, this.ignoreList, (arrVal, othVal) => arrVal.uid === othVal);
+        } else if (this.strategy !== st.noop) {
+          list = this.list
+            .map(item => ({ ...item, seen: this.show(item.uid) }));
         }
-        return this.list;
-      },
-      children() {
-        return this.$children[0].$children;
+        return _.chunk(list, this.length);
       },
       strategy() {
         return this.$store.state.strategy;
@@ -82,9 +81,9 @@
       items() {
         return {
           length: this.list.length,
-          pageLength: document.documentElement.scrollHeight
-        }
-      }
+          pageLength: document.documentElement.scrollHeight,
+        };
+      },
     },
     watch: {
       strategy(newStrategy, oldStrategy) {
@@ -109,19 +108,13 @@
         this.length = this.height('length');
       },
       height(value) {
-          console.log(mediaQueryWidth());
         return mediaQueryWidth()[value];
       },
       open(uid) {
         this.$store.dispatch(at.appendToIgnoreList, { items: flatten([uid]) });
       },
       show(uid) {
-        const strategy = this.strategy === st.hide;
-        return this.ignoreList.includes(uid) && strategy;
-      },
-      seen(uid) {
-        const strategy = this.strategy === st.noop;
-        return this.ignoreList.includes(uid) && !strategy;
+        return this.ignoreList.includes(uid);
       },
       fetchNew: debounce(
         function() {
@@ -133,20 +126,23 @@
       darkenOnScrollListener: debounce(
         function() {
           this.lastScrollTop = onScroll(this.lastScrollTop, () => {
-            if (this.children) {
-              const seenArray = this.children.reduce((newArray, child) => {
-                const uid = child.$props.profile.uid;
-                if (isElementHigher(child.$el) && uid) {
-                  newArray.push(uid);
-                }
-                return newArray;
-              }, []);
+            const children = this.$refs.vueVirtualScroller.$children;
+            children.shift();
+            const child = findLast(children, el => isElementHigher(el.$el));
+            if (child) {
+              const { uid } = child.$props.item;
+              const seenArray = this.list
+                .slice(0, this.list.findIndex(el => el.uid === uid))
+                .map(el => el.uid);
               this.open(seenArray);
             }
           });
-        }, 1000),
+        },
+        1000
+      ),
     },
-  };
+  }
+  ;
 </script>
 
 <style scoped>

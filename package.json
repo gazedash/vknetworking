@@ -6,6 +6,7 @@
   "private": true,
   "homepage": "https://shoegazerwithak.github.io/vknetworking",
   "scripts": {
+    "prod": "npm run build && node build/prod-server.js",
     "dev": "node build/dev-server.js",
     "build": "node build/build.js",
     "predeploy": "npm run build",
