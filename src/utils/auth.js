@@ -10,10 +10,11 @@ export function logout() {
   user.authenticated = false;
 }
 
-export function redirected(to: Object, from: Object, next: Function = () => {}) {
+export function redirected(to: Object, from: Object, next: Function = () => {
+}) {
   if (to.hash) {
-    const userId = to.hash.split('user_id=')[1];
-    localStorage.setItem('lastLoginUserId', userId);
+    const user_id = to.hash.split('user_id=')[1];
+    localStorage.setItem('lastLoginUserId', user_id);
     const token = to.hash.split('access_token=')[1].split('&')[0];
     if (token) {
       localStorage.setItem('token', token);
@@ -33,7 +34,8 @@ export function checkAuth() {
   return !!token;
 }
 
-export function ifLoggedIn(to: Object, from: Object, next: Function = () => {}) {
+export function ifLoggedIn(to: Object, from: Object, next: Function = () => {
+}) {
   console.log('to login');
   if (checkAuth()) {
     next('/');
@@ -42,7 +44,8 @@ export function ifLoggedIn(to: Object, from: Object, next: Function = () => {}) 
   }
 }
 
-export function requireAuth(to: Object, from: Object, next: Function = () => {}) {
+export function requireAuth(to: Object, from: Object, next: Function = () => {
+}) {
   if (!checkAuth()) {
     console.log(!checkAuth());
     next({

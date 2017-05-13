@@ -6,7 +6,8 @@ export function isBottomOfPage() {
   return (window.innerHeight + window.scrollY + 800) >= document.body.scrollHeight;
 }
 
-export function iterateWithDelay(array: Array<any>, cb: Function = () => {}, delay: number = 1000) {
+export function iterateWithDelay(array: Array<any>, cb: Function = () => {
+}, delay: number = 1000) {
   let counter = 0;
   const inter = setInterval(() => {
     const items = array[counter];
@@ -18,7 +19,8 @@ export function iterateWithDelay(array: Array<any>, cb: Function = () => {}, del
   }, delay);
 }
 
-export function show(strategy: string, cb: Function = () => {}) {
+export function show(strategy: string, cb: Function = () => {
+}) {
   switch (strategy) {
     case st.noop:
       return true;
@@ -71,7 +73,6 @@ export function windowClosedPromise(win: window) {
   return new Promise((resolve, reject) => {
     // A mock async action using setTimeout
     const winClosed = setInterval(() => {
-      // console.log(win);
       if (win.closed) {
         clearInterval(winClosed);
         resolve(true);
@@ -130,8 +131,10 @@ export function createSignInPopup() {
 }
 
 // eslint-disable-next-line func-names
-export function onScroll(delta = 0, downCb = function () {}, upCb = function () {}) {
-  // delta: number, downCb: Function = () {}, upCb: Function = () {}
+export function onScroll(
+  delta /* : number */ = 0,
+  downCb /* : Function */ = function () {},
+  upCb /* : Function */ = function () {}) {
   const offset = window.pageYOffset || document.documentElement.scrollTop;
   if (offset > delta) {
     downCb();
@@ -142,8 +145,8 @@ export function onScroll(delta = 0, downCb = function () {}, upCb = function () 
   return offset;
 }
 
-export function addOrRemoveListener({ newStrategy, oldStrategy, cmpStrategy, listener }) {
-  // newStrategy: string, oldStrategy: string, cmpStrategy: string, listener: EventListener
+type AddOrRemoveListenerArgs = { newStrategy: string, oldStrategy: string, cmpStrategy: string, listener: Function };
+export function addOrRemoveListener({ newStrategy, oldStrategy, cmpStrategy, listener }: AddOrRemoveListenerArgs) {
   if (newStrategy === cmpStrategy) {
     if (newStrategy !== oldStrategy) {
       window.addEventListener('scroll', listener);

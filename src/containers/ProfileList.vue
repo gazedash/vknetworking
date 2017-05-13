@@ -30,12 +30,18 @@
 
 <script>
   import Profile from '../components/Profile'
-  import { isBottomOfPage, isElementHigher, addOrRemoveListener, mediaQueryWidth } from '../utils/index';
+  import {
+    isBottomOfPage,
+    isElementHigher,
+    addOrRemoveListener,
+    mediaQueryWidth,
+    isElementInViewport
+  } from '../utils/index';
   import debounce from 'lodash/debounce'
   import * as at from "../store/actionTypes"
   import { strategy as st } from "../const/index"
   import { onScroll } from '../utils'
-  import { flatten, findLast, differenceWith } from 'lodash';
+  import { flatten, findLast, differenceWith, every } from 'lodash';
 
   export default {
     name: 'profile-list',
@@ -43,6 +49,7 @@
     data () {
       return {
         lastScrollTop: 0,
+        checkScroll: false,
         length: 4,
       };
     },
@@ -60,6 +67,9 @@
         window.addEventListener('scroll', this.darkenOnScrollListener);
       }
     },
+    updated() {
+      this.scrollTopIfNoVisibleItems();
+    },
     beforeDestroy() {
       window.removeEventListener('resize', this.handleWindowResize);
       window.removeEventListener('scroll', this.darkenOnScrollListener);
@@ -69,9 +79,15 @@
         let list = this.list;
         if (this.strategy === st.hide) {
           list = differenceWith(list, this.ignoreList, (arrVal, othVal) => arrVal.uid === othVal);
-        } else if (this.strategy !== st.noop) {
-          list = this.list
-            .map(item => ({ ...item, seen: this.show(item.uid) }));
+        } else {
+          if (this.strategy !== st.noop) {
+            list = this.list
+              .map(item => ({ ...item, seen: this.show(item.uid) }));
+          }
+          if (this.strategy === st.lastFm) {
+            list = this.list
+              .filter(el => !!el.site && el.site.match('last.fm/user/.+'));
+          }
         }
         return _.chunk(list, this.length);
       },
@@ -87,11 +103,14 @@
     },
     watch: {
       strategy(newStrategy, oldStrategy) {
+        if (newStrategy !== oldStrategy && newStrategy === st.hide) {
+          this.checkScroll = true;
+        }
         addOrRemoveListener({
           newStrategy,
           oldStrategy,
           cmpStrategy: st.darkenOnScroll,
-          listener: this.darkenOnScrollListener
+          listener: this.darkenOnScrollListener,
         });
       },
       items: debounce(function(items, oldItems) {
@@ -104,6 +123,18 @@
       }, 500),
     },
     methods: {
+      scrollTopIfNoVisibleItems() {
+        if (this.checkScroll) {
+          this.checkScroll = false;
+          const children = this.$refs.vueVirtualScroller.$children;
+          children.shift();
+          const child = every(children, el => isElementHigher(el.$el));
+          // all not in viewport
+          if (child) {
+            window.scroll(0, 0);
+          }
+        }
+      },
       handleWindowResize() {
         this.length = this.height('length');
       },

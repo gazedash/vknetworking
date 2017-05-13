@@ -8,13 +8,13 @@
 </template>
 
 <script>
-  import {logout} from "../utils/auth";
+  import { logout } from "../utils/auth";
   export default {
     name: 'logout',
     methods: {
       logoutInner() {
         logout();
-        this.$router.push({name: 'login'});
+        this.$router.push({ name: 'login' });
       }
     },
   }

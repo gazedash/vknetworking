@@ -9,11 +9,11 @@
 
 <script>
   export default {
-      name: 'settings-button',
-      methods: {
-          open() {
-            this.$router.push({name: 'settings'});
-          }
+    name: 'settings-button',
+    methods: {
+      open() {
+        this.$router.push({ name: 'settings' });
       }
+    }
   }
 </script>

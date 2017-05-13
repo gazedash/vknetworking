@@ -2,6 +2,7 @@
   <div class="root">
     <div @click="reset" class="button">
       reset
+
     </div>
   </div>
 </template>
@@ -24,6 +25,7 @@
     bottom: 0;
     top: 101%;
   }
+
   .button {
     cursor: pointer;
     font-size: 12px;

@@ -3,19 +3,21 @@
     <div class="text">
       This application finds people in all groups that specified profile is subscribed to
       and filters them by criteria that you specify.
+
     </div>
-    <mu-flat-button @click="doNotShowAgain" class="button" backgroundColor="rgba(255,255,255,0.2)" color="white">OK</mu-flat-button>
+    <mu-flat-button @click="doNotShowAgain" class="button" backgroundColor="rgba(255,255,255,0.2)" color="white">OK
+    </mu-flat-button>
   </div>
 </template>
 
 <script>
   export default {
-      name: 'welcome',
-      methods: {
-          doNotShowAgain() {
-              this.$emit('doNotShowAgain')
-          }
+    name: 'welcome',
+    methods: {
+      doNotShowAgain() {
+        this.$emit('doNotShowAgain')
       }
+    }
   }
 </script>
 
@@ -32,6 +34,7 @@
     .button {
       color: #000 !important;
     }
+
     .welcome {
       color: #000;
       position: relative;

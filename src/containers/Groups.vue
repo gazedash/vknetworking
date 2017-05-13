@@ -59,14 +59,14 @@
     methods: {
       onSubmitLocal() {
         this.close('top');
-        let userId = this.$store.getters.getUserId(this.profileLink);
-        const fetchData = (user_id) => this.$store.dispatch(at.getFirstGroupNext, {user_id});
-        if (userId) {
-          fetchData(userId);
+        let user_id = this.$store.getters.getUserId(this.profileLink);
+        const fetchData = (user_id) => this.$store.dispatch(at.getFirstGroupNext, { user_id });
+        if (user_id) {
+          fetchData(user_id);
         } else {
-          userId = this.profileLink;
-          if (userId) {
-            this.$store.dispatch(at.getUser, userId).then((user) => {
+          user_id = this.profileLink;
+          if (user_id) {
+            this.$store.dispatch(at.getUser, user_id).then((user) => {
               return fetchData(user.uid);
             })
           }

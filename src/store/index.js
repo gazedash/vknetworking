@@ -180,9 +180,10 @@ const actions = {
         return items;
       }));
   },
-  [at.getGroupIdList]({ commit, dispatch }, { user_id }) {
+  [at.getGroupIdList]({ commit, dispatch }, { user_id, ...rest }) {
     return dispatch(at.incrCheckAndWait).then(() => fetchGroups({ user_id })
       .then((items) => {
+        console.log(user_id, rest);
         commit(mt.setGroupIdList, { items, user_id });
         return items;
       }));
@@ -193,6 +194,9 @@ const actions = {
   [at.getProfilesFromGroup]({ commit, dispatch }, payload) {
     return dispatch(at.incrCheckAndWait).then(() => fetchMembers(payload)
       .then((items) => {
+        // if (payload.second || payload.offset) {
+        //   console.error('getProfilesFromGroup N PART', payload, items);
+        // }
         commit(mt.setFetchedGroupsLength);
         commit(mt.setProfilesFromGroup, { items });
         if (items.length >= 999) {
@@ -365,20 +369,20 @@ export const getters = {
   getStoredUserId: state => user_id => state.aliases[user_id],
   getCurrentUserGroups: state => state.groupIdList[state.currentUser.user_id],
   getUserGroups: state => user_id => state.groupIdList[user_id],
-  getUserId: (store, getters) => (userId) => {
-    const id = parseInt(userId, 10) || parseInt(userId.split('id')[1], 10);
-    const link = userId.split('vk.com/')[1];
+  getUserId: (store, getters) => (user_id) => {
+    const id = parseInt(user_id, 10) || parseInt(user_id.split('id')[1], 10);
+    const link = user_id.split('vk.com/')[1];
     switch (true) {
-      case !userId:
+      case !user_id:
         return localStorage.getItem('lastLoginUserId');
-      case Number.isInteger(userId):
-        return userId;
+      case Number.isInteger(user_id):
+        return user_id;
       case id:
         return id;
       case link:
         return link;
       default:
-        return getters.getStoredUserId(userId) || null;
+        return getters.getStoredUserId(user_id) || null;
     }
   },
 };

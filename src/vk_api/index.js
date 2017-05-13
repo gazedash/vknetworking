@@ -9,7 +9,7 @@ function api_key() {
 }
 const endpoint = 'https://api.vk.com';
 const OAuthEndpoint = 'https://oauth.vk.com/authorize?';
-const profileFields = 'fields=photo_max,first_name,last_name';
+const profileFields = 'fields=photo_max,first_name,last_name,site';
 const countAndOnline = 'count=1000&online=0';
 export const redirect_uri = 'https://vk-networking.firebaseapp.com/auth';
 

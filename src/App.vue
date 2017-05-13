@@ -14,6 +14,7 @@
   .mu-dropDown-menu-text-overflow {
     color: #fff;
   }
+
   .profile-list {
     display: inline-flex;
     justify-content: center;

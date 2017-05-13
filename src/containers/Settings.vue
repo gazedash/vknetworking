@@ -25,7 +25,7 @@
   import AppHeader from '../components/AppHeader';
   import Logout from '../components/Logout';
   import * as at from "../store/actionTypes";
-  import {resetConst} from "../const/index";
+  import { resetConst } from "../const/index";
   export default {
     name: 'search-popup',
     created () {
@@ -61,7 +61,7 @@
       },
       setSettings () {
         const settings = JSON.parse(atob(this.importSettings));
-        this.$store.dispatch(at.setSettings, {settings});
+        this.$store.dispatch(at.setSettings, { settings });
       },
       showToast (message) {
         if (message) {
@@ -78,10 +78,10 @@
         if (this.toastTimer) clearTimeout(this.toastTimer)
       },
       reset () {
-        this.$store.dispatch(at.setSettings, {settings: resetConst});
+        this.$store.dispatch(at.setSettings, { settings: resetConst });
       },
     },
-    components: {AppHeader, Logout},
+    components: { AppHeader, Logout },
   }
 </script>
 

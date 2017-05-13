@@ -5,15 +5,15 @@
 </template>
 
 <script>
-export default {
+  export default {
     name: 'my-popup',
     props: ['open', 'position'],
     methods: {
-       closeInner() {
-         this.$emit('close');
-       }
+      closeInner() {
+        this.$emit('close');
+      }
     }
-}
+  }
 </script>
 
 <style>
