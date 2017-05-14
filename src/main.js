@@ -7,7 +7,7 @@ import store from './store';
 import App from './App';
 import Shell from './containers/Shell';
 import Settings from './containers/Settings';
-import Groups from './containers/Groups';
+// import Groups from './containers/Groups';
 import Login from './components/Login';
 import { ifLoggedIn, initialCheck, redirected, requireAuth } from './utils/auth';
 import lazy from './directives/lazy';
@@ -28,7 +28,7 @@ const router = new VueRouter({
   routes: [
     { path: '/', component: Shell, beforeEnter: requireAuth },
     { name: 'settings', path: '/settings', component: Settings, beforeEnter: requireAuth },
-    { name: 'groups', path: '/groups', component: Groups, beforeEnter: requireAuth },
+    // { name: 'groups', path: '/groups', component: Groups, beforeEnter: requireAuth },
     { name: 'login', path: '/login', component: Login, beforeEnter: ifLoggedIn },
     { path: '/auth', beforeEnter: redirected },
   ],
