@@ -29,6 +29,8 @@
 </template>
 
 <script>
+  /* eslint-disable func-names */
+
   import Profile from '../components/Profile'
   import {
     isBottomOfPage,
@@ -85,8 +87,10 @@
               .map(item => ({ ...item, seen: this.show(item.uid) }));
           }
           if (this.strategy === st.lastFm) {
+              //lastfm.ru
             list = this.list
-              .filter(el => !!el.site && el.site.match('last.fm/user/.+'));
+              .filter(el => !!el.site && el.site.match(/last\.?fm(.ru)?\/user\/[a-zA-Z0-9_-]{2,14}/gi));
+            console.log(list);
           }
         }
         return _.chunk(list, this.length);

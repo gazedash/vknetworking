@@ -34,7 +34,7 @@
     },
     computed: {
       lastfm() {
-        const matchedLastFm = this.item.site.match(/last.fm\/user\/[a-zA-Z0-9_-]{2,14}/gi);
+        const matchedLastFm = this.item.site.match(/last\.?fm(.ru)?\/user\/[a-zA-Z0-9_-]{2,14}/gi);
         if (!!this.item.site && matchedLastFm) {
           return `https://${matchedLastFm[0]}`;
         }
