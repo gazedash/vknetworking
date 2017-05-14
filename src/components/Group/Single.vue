@@ -6,19 +6,18 @@
       <img class="image" v-lazy="user.photo_50"/>
       <div class="title">{{ user.first_name }} {{ user.last_name }}</div>
     </a>
-    <div class="members">
-      <a class="link" v-for="group in groups"
-         :href="'https://vk.com/public' + group.info.gid"
-         target="_blank">
-        <img :title="group.info.name" class="group-icon" v-lazy="group.info.photo"/>
-      </a>
-    </div>
+    <small-group class="members" :key="group" v-for="group in groups" :item="group.info"></small-group>
   </div>
 </template>
 
 <script>
+  import SmallGroup from './SmallGroup';
+
   export default {
     name: 'single',
+    components: {
+      SmallGroup,
+    },
     props: {
       item: { type: Object, required: true },
     },
@@ -57,16 +56,6 @@
     border-top: solid 1px #e7e8ec;
     padding: 10px;
     display: flex;
-  }
-
-  .group-icon {
-    /*border-radius: 50%;*/
-    width: 46px;
-    height: 46px;
-    margin-right: 5px;
-    /*0*/
-    /*display: flex;*/
-    /*justify-content: center;*/
   }
 
   .logo {

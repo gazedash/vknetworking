@@ -43,16 +43,16 @@
       return {
         profileLink: '',
         topPopup: true,
-      }
+      };
     },
     computed: {
-      singles () {
+      singles() {
         return this.$store.getters.getSingle;
       },
-      list () {
+      list() {
         return this.$store.getters.getCommonGroups;
       },
-      size () {
+      size() {
         return this.$store.state.friendCounter
       },
     },
@@ -68,7 +68,7 @@
           if (user_id) {
             this.$store.dispatch(at.getUser, user_id).then((user) => {
               return fetchData(user.uid);
-            })
+            });
           }
         }
       },
@@ -82,7 +82,7 @@
     components: {
       AppHeader, GroupsButton, SettingsButton, Logout, GroupList, MyPopup, SearchButton
     },
-  }
+  };
 </script>
 
 <style scoped>

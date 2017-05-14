@@ -1,20 +1,32 @@
 <template>
   <div>
-    <group
-      v-for="item, id in filteredList"
-      :item="item"
-      :key="id"
-    ></group>
-    <div class="stats">Groups: {{ size }} Friends:
-      <span>{{ list.length }}</span>
-      <single v-for="s, id in singles" :key="id" :item="s"></single>
-    </div>
+    <virtual-scroller
+      :pageMode="false"
+      ref="vueVirtualScroller"
+      :items="filteredList"
+      :item-height="100">
+      <template scope="props">
+        <group
+          :item="props.item"
+          :key="props.id"
+        ></group>
+      </template>
+    </virtual-scroller>
+    <!--<group-->
+      <!--v-for="item, id in filteredList"-->
+      <!--:item="item"-->
+      <!--:key="id"-->
+    <!--&gt;</group>-->
+    <!--<div class="stats">Groups: {{ size }} Friends:-->
+      <!--<span>{{ list.length }}</span>-->
+      <!--<single v-for="s, id in singles" :key="id" :item="s"></single>-->
+    <!--</div>-->
   </div>
 </template>
 
 <script>
-  import Group from '../components/Group'
-  import Single from '../components/Single'
+  import Group from '../components/Group/Group'
+  import Single from '../components/Group/Single'
   import * as at from "../store/actionTypes"
   import _ from 'lodash';
 

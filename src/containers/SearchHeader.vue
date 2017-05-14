@@ -6,7 +6,7 @@
         <ignore-strategy-select :strategy="strategy" @change="changeStrategy"></ignore-strategy-select>
       </div>
       <div class="right" slot="right">
-        <!--<groups-button></groups-button>-->
+        <groups-button></groups-button>
         <settings-button></settings-button>
         <clear-list-button @clear="clear"></clear-list-button>
         <logout></logout>
