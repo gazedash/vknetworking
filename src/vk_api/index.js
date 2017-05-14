@@ -97,7 +97,7 @@ export function buildGetUser(params: Object) {
 }
 
 export function buildFriendsGet(params: Object) {
-  return `${baseMethod('friends.get') + paramsToString(params)}&count=10000`;
+  return `${baseMethod('friends.get')}${paramsToString(params)}&count=10000`;
 }
 
 export function buildVkAuthUrl({ scope = 'groups', display = 'page', v = '5.626', response_type = 'token' }) {
@@ -146,8 +146,8 @@ export function fetchExecuteGetGroupInfo({ items }) {
     .then(json => json.response ? json.response : []);
 }
 
-export function fetchFriends({ user_id }) {
-  return fetchWrapper({ cb: buildFriendsGet({ user_id }) })
+export function fetchFriends({ user_id, fields }) {
+  return fetchWrapper({ cb: buildFriendsGet({ user_id, fields }) })
     .then(json => json.response ? json.response : []);
 }
 
@@ -175,12 +175,19 @@ export function fetchCities({ country_id = 1, q = '', need_all = 0, count = 100 
     .then(json => json.response ? json.response : []);
 }
 
-export function fetchGroups({ user_id }) {
+export function fetchGroups({ user_id, extended = 0 }) {
   // return Promise.resolve(
   //   JSON.parse("[0]")
   // ).then(data => data);
-  return fetchWrapper({ cb: buildGetSubscriptions({ user_id }) })
-    .then(json => json.response ? json.response : []);
+  return fetchWrapper({ cb: buildGetSubscriptions({ user_id, extended }) })
+    .then(json => {
+      if (json.response) {
+        json.response.count = json.response[0];
+        json.response.shift();
+        return json.response;
+      }
+      return [];
+    });
 }
 
 export function fetchMembers({ q, group_id, offset = 0, country, city, sex = 0, age_from, age_to, hometown, has_photo = 1 }) {
