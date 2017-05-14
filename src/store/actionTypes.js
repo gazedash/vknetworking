@@ -3,6 +3,7 @@ export const getUser = 'getUser';
 export const getCountries = 'getCountries';
 export const getCities = 'getCities';
 export const getGroupIdList = 'getGroupIdList';
+export const getGroupUsersList = 'getGroupUsersList';
 export const getGroupIdListNoCommit = 'getGroupIdListNoCommit';
 export const getGroupCommonFriendsFromFriendGroups = 'getGroupCommonFriendsFromFriendGroups';
 export const getExecuteFriendsInGroup = 'getExecuteFriendsInGroup';
