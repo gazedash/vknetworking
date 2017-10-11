@@ -5,3 +5,5 @@ npm-debug.log
 usr/
 .idea/
 flow-typed
+/build/secret.js
+.history

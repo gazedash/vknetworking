@@ -3,6 +3,7 @@ export const user = {
   authenticated: false,
   firstTime: true,
   doNotShowAgain: false,
+  token: null,
 };
 
 export function logout() {
@@ -19,6 +20,7 @@ export function redirected(to: Object, from: Object, next: Function = () => {
     if (token) {
       localStorage.setItem('token', token);
       user.authenticated = true;
+      user.token = token;
     } else {
       window.close();
       next('/login');

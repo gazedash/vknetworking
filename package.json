@@ -20,6 +20,7 @@
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.4",
     "muse-ui": "^2.0.0-rc.5",
+    "promise-worker": "^1.1.1",
     "vue": "^2.2.4",
     "vue-router": "^2.3.0",
     "vue-virtual-scroller": "^0.6.1",
@@ -70,7 +71,8 @@
     "webpack-bundle-analyzer": "^2.3.1",
     "webpack-dev-middleware": "^1.10.1",
     "webpack-hot-middleware": "^2.17.1",
-    "webpack-merge": "^4.1.0"
+    "webpack-merge": "^4.1.0",
+    "worker-loader": "^0.8.0"
   },
   "engines": {
     "node": ">= 4.0.0",

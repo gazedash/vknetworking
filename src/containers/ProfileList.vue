@@ -77,6 +77,9 @@
       window.removeEventListener('scroll', this.darkenOnScrollListener);
     },
     computed: {
+      payload() {
+        return this.$store.state.payload;
+      },
       splitFilteredList () {
         let list = this.list;
         if (this.strategy === st.hide) {
@@ -87,8 +90,14 @@
               .map(item => ({ ...item, seen: this.show(item.uid) }));
           }
           if (this.strategy === st.lastFm) {
+            const filterPredicate = el => !!el.site && el.site.match(/last\.?fm(.ru)?\/user\/[a-zA-Z0-9_-]{2,14}/gi);
+            let fp = filterPredicate;
+            const { city } = this.payload;
+            if (city) {
+              fp = el => filterPredicate(el) && el.city === city;
+            }
             list = this.list
-              .filter(el => !!el.site && el.site.match(/last\.?fm(.ru)?\/user\/[a-zA-Z0-9_-]{2,14}/gi));
+              .filter(el => fp(el));
           }
         }
         return _.chunk(list, this.length);

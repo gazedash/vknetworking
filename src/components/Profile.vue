@@ -2,8 +2,7 @@
   <a class="root" @click="open" @mouseenter="mouseOver(item.uid)" @mouseleave="mouseLeave"
      :href="'https://vk.com/id' + item.uid"
      target="_blank">
-    <div :class="[ item.seen ? 'seen ' + size : '' ]">
-    </div>
+    <div :class="[ item.seen ? 'seen ' + size : '' ]"></div>
     <div class="image">
       <img :class="size" v-lazy="item.photo_max"/>
       <div v-if="activeId === item.uid" :class="'name ' + size + '_name'">
@@ -34,9 +33,11 @@
     },
     computed: {
       lastfm() {
-        const matchedLastFm = this.item.site.match(/last\.?fm(.ru)?\/user\/[a-zA-Z0-9_-]{2,14}/gi);
-        if (!!this.item.site && matchedLastFm) {
-          return `https://${matchedLastFm[0]}`;
+        if (this.item.site) {
+          const matchedLastFm = this.item.site.match(/last\.?fm(.ru)?\/user\/[a-zA-Z0-9_-]{2,14}/gi);
+          if (matchedLastFm) {
+            return `https://${matchedLastFm[0]}`;
+          }
         }
         return null;
       },

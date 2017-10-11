@@ -4,9 +4,10 @@
       <div class="left" slot="left">
         <search-button @click.native="open('top')"></search-button>
         <ignore-strategy-select :strategy="strategy" @change="changeStrategy"></ignore-strategy-select>
+        <div @click="switchSource">{{ source }}</div>
       </div>
       <div class="right" slot="right">
-        <!--<groups-button></groups-button>-->
+        <groups-button></groups-button>
         <settings-button></settings-button>
         <clear-list-button @clear="clear"></clear-list-button>
         <logout></logout>
@@ -50,10 +51,11 @@
     },
     data () {
       return {
+        source: 'friends',
         cities: [],
         searchData: [],
         topPopup: true,
-      }
+      };
     },
     computed: {
       strategy () {
@@ -76,6 +78,13 @@
       window.removeEventListener('scroll', this.submitOnBottomOfPage)
     },
     methods: {
+      switchSource() {
+        if (this.source === 'groups') {
+          this.source = 'friends';
+        } else {
+          this.source = 'groups';
+        }
+      },
       submitOnBottomOfPage: debounce(
         function() {
           if (isBottomOfPage()) {
@@ -121,14 +130,30 @@
       },
       finallyFetch({ query: q, ...data }) {
         const payload = { ...data, q };
-        if (this.$store.getters.getUserGroups(data.user_id)) {
-          this.$store.dispatch(at.getNext, payload);
-        } else {
-          this.$store.dispatch(at.getFirstNext, payload);
+        if (this.source === 'friends') {
+          console.log('friends', this.$store.state.friendList);
+          if (this.$store.state.friendList.length !== 0) {
+            console.log('dalee');
+            this.$store.dispatch(at.getNextFoF, payload);
+          } else {
+            console.log('hui');
+            this.$store.dispatch(at.getFirstNextFoF, payload);
+          }
+        }
+        if (this.source === 'groups') {
+          if (this.$store.getters.getUserGroups(data.user_id)) {
+            this.$store.dispatch(at.getNext, payload);
+          } else {
+            this.$store.dispatch(at.getFirstNext, payload);
+          }
         }
       },
       onSubmit(data) {
-        data ? this.searchData = data : data = this.searchData;
+        if (data) {
+          this.searchData = data;
+        } else {
+          data = this.searchData;
+        }
         this.close('top');
         const fetchData = (data, user_id) => this.finallyFetch({ ...data, user_id });
         let user_id = this.$store.getters.getUserId(data.profileLink);

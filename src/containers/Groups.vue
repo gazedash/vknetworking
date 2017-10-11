@@ -22,7 +22,7 @@
         </div>
       </div>
     </my-popup>
-    <group-list :size="size" :singles="singles" :list="list"></group-list>
+    <group-list :list="list"></group-list>
   </div>
 </template>
 
@@ -46,15 +46,15 @@
       };
     },
     computed: {
-      singles() {
-        return this.$store.getters.getSingle;
-      },
+//      singles() {
+//        return this.$store.getters.getSingle;
+//      },
       list() {
         return this.$store.getters.getCommonGroups;
       },
-      size() {
-        return this.$store.state.friendCounter
-      },
+//      size() {
+//        return this.$store.state.friendCounter
+//      },
     },
     methods: {
       onSubmitLocal() {

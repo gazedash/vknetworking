@@ -1,17 +1,28 @@
 <template>
   <div id="shell">
     <search-header></search-header>
-    <profile-list :size="size" :list="list" :ignoreList="ignoreList"></profile-list>
+    <profile-list v-if="friendList.length" :list="friendList" :ignoreList="ignoreList"></profile-list>
+    <profile-list v-else :size="size" :list="list" :ignoreList="ignoreList"></profile-list>
   </div>
 </template>
 
 <script>
+  import { user } from '../utils/auth';
+  import * as mt from '../store/mutationTypes';
   import SearchHeader from './SearchHeader'
   import ProfileList from './ProfileList'
 
   export default {
     name: 'shell',
+    created() {
+      if (user.token) {
+        this.$store.commit(mt.setToken, user.token);
+      }
+    },
     computed: {
+      friendList() {
+        return this.$store.state.friendListFoF;
+      },
       ignoreList() {
         return this.$store.state.ignoreList
       },

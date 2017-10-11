@@ -46,14 +46,15 @@
     },
     computed: {
       filteredList () {
-        return _.sortBy(this.list, ['data', 'length']).reverse();
+//        return _.sortBy(this.list, ['data', 'length']).reverse();
+        return this.list;
       },
-      items() {
-        return {
-          length: this.filteredList.length,
-          pageLength: document.documentElement.scrollHeight
-        };
-      },
+//      items() {
+//        return {
+//          length: this.filteredList.length,
+//          pageLength: document.documentElement.scrollHeight
+//        };
+//      },
     },
     methods: {
 //      fetchNew: _.debounce(
@@ -68,8 +69,8 @@
 //          }
 //        }, 1000),
     },
-    watch: {
-      items(items, oldItems) {
+//    watch: {
+//      items(items, oldItems) {
 //        const diff = items.length - oldItems.length;
 //        console.log(items, oldItems);
 //        const screenSizeIsNotChanged = items.pageLength === oldItems.pageLength;
@@ -77,8 +78,8 @@
 //        if (notEnoughNewProfiles) {
 //          this.fetchNew();
 //        }
-      }
-    }
+//      }
+//    }
   }
 </script>
 

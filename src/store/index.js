@@ -2,15 +2,28 @@
 // @flow
 import Vue from 'vue';
 import Vuex from 'vuex';
-import uniqBy from 'lodash/uniqBy';
-import uniq from 'lodash/uniq';
-import _ from 'lodash';
-import { fetchCities, fetchCountries, fetchFriends, fetchGroups, fetchMembers, fetchUser } from '../vk_api/index';
+import _, { uniq, uniqBy } from 'lodash';
+import {
+  fetchCities,
+  fetchCountries,
+  fetchExecuteGetGroups,
+  fetchFriends,
+  fetchGroups,
+  fetchMembers,
+  fetchUser,
+} from '../vk_api/index';
 import * as mt from './mutationTypes';
 import * as at from './actionTypes';
 import { get } from '../utils/storage';
 import { ignoreList, resetConst, strategy as st } from '../const/index';
-
+// import PromiseWorker from 'promise-worker';
+// const MyWorker = require('worker-loader!../workers/worker.js');
+// const worker = new MyWorker();
+// const promiseWorker = new PromiseWorker(worker);
+// fetchGroups({ user_id: newUserId, extended })
+//   .catch(function (error) {
+//     console.log(error);
+//   });
 Vue.use(Vuex);
 
 const state = {
@@ -30,9 +43,13 @@ const state = {
   settings: '',
   // groupCommonFriends: {},
   friendList: [],
+  friendListFoF: [],
   friendCounter: 0,
   groups: {},
   singles: {},
+  user: { token: localStorage.token },
+  // payload is latest search params
+  payload: {},
 };
 
 // mutations are operations that actually mutates the state.
@@ -43,6 +60,12 @@ const state = {
 const mutations = {
   [mt.incrDebounceCounter](state) {
     state.debounceCounter++;
+  },
+  [mt.setToken](state, token) {
+    state.user = { ...state.user, token };
+  },
+  [mt.search](state, { payload }) {
+    state.payload = payload;
   },
   [mt.incrFriendCounter](state) {
     state.friendCounter++;
@@ -88,8 +111,12 @@ const mutations = {
     state.profileList = uniqBy(profileList.concat(items), 'uid');
   },
   [mt.setFriends](state, { items = [] }) {
-    const friendList = state.friendList;
-    state.friendList = uniqBy(items.concat(friendList || []));
+    const friendList = state.friendList || [];
+    state.friendList = uniqBy(friendList.concat(items || []), 'uid');
+  },
+  [mt.setFriendsFoF](state, { items = [] }) {
+    const friendListFoF = state.friendListFoF || [];
+    state.friendListFoF = uniqBy(friendListFoF.concat(items || []), 'uid');
   },
   [mt.setUser](state, { items }) {
     state.users = { ...state.users, [items.uid]: items };
@@ -195,12 +222,20 @@ const actions = {
         return items;
       }));
   },
-  [at.getGroupUsersList]({ commit, dispatch }, { user_id, extended = 0 }) {
-    console.log('getGroupUsersList', user_id);
-    const newUserId = user_id.uid || user_id;
-    return dispatch(at.incrCheckAndWait).then(() => fetchGroups({ user_id: newUserId, extended })
-      .then((items) => {
-        commit(mt.setGroupUsersList, { items, user_id: newUserId });
+  [at.getGroupUsersList]({ commit, state, dispatch }, { items, extended = 0 }) {
+    // [at.getGroupUsersList]({ commit, state, dispatch }, { user_id, extended = 0 }) {
+    //   console.log('getGroupUsersList', user_id);
+    //   const newUserId = user_id.uid || user_id;
+    // console.log(state.user);
+    // const x = promiseWorker.postMessage({ user_id: 126125228, extended: 0, token: state.user.token });
+    // x.then((data) => {
+    //   console.log('data', data);
+    // });
+    // return dispatch(at.incrCheckAndWait).then(() => fetchGroups({ user_id: newUserId, extended })
+    return dispatch(at.incrCheckAndWait).then(() => fetchExecuteGetGroups({ items, extended })
+      .then((groups) => {
+        // commit(mt.setGroupUsersList, { items, user_id: newUserId });
+        commit(mt.setGroupUsersList, { items: groups });
         return items;
       }));
   },
@@ -234,6 +269,38 @@ const actions = {
     return dispatch(at.getGroupIdList, { user_id: payload.user_id })
       .then(items => dispatch(at.getNext, { items, ...payload }));
   },
+  [at.getFirstNextFoF]({ dispatch, commit }, payload) {
+    commit(mt.search, { payload });
+    return dispatch(at.getFriends, { user_id: payload.user_id })
+      .then(items => dispatch(at.getNextFoF, { items, ...payload }));
+  },
+  [at.getNextFoF]({ dispatch, commit, state }, { items, ...payload }) {
+    // payload is options for profile searching
+    const newItems = items || state.friendList;
+    const index = state.index[payload.user_id];
+    let nextIndex = !index && index !== 0 ? 0 : index + 1;
+    if (!nextIndex) {
+      commit(mt.setIndex, { user_id: payload.user_id, index: 0 });
+      nextIndex = 0;
+    }
+    if (nextIndex < newItems.length) {
+      commit(mt.setIndex, { user_id: payload.user_id, index: nextIndex });
+      commit(mt.setCurrentUser, payload);
+      const user_id = newItems[state.index[payload.user_id]].uid;
+      console.log(user_id);
+      return dispatch(at.getFriends, {
+        ...payload,
+        user_id,
+        fof: true,
+      }).then((profiles) => {
+        if (profiles.length !== 0) {
+          return items;
+        }
+        return [];
+      });
+    }
+    return [];
+  },
   [at.getNext]({ dispatch, commit, state }, { items, ...payload }) {
     // payload is options for profile searching
     const newItems = items || state.groupIdList[payload.user_id];
@@ -250,7 +317,7 @@ const actions = {
         group_id: newItems[state.index[payload.user_id]], ...payload,
       }).then((profiles) => {
         if (profiles.length !== 0) {
-          return commit(mt.setProfilesFromGroup, { newItems });
+          return commit(mt.setProfilesFromGroup, { items: newItems });
         }
         return [];
       });
@@ -301,25 +368,71 @@ const actions = {
       }
     }
   },
-  [at.getFriends]({ dispatch, commit }, { user_id }) {
+  [at.getFriends]({ dispatch, commit }, { user_id, fof = false }) {
+    console.log(user_id, fof);
     return dispatch(at.incrCheckAndWait).then(() => fetchFriends({
       user_id,
-      fields: 'uid,first_name,last_name,photo_50'
+      fields: 'uid,first_name,last_name,photo_max,site,city,country',
     })
       .then((items) => {
-        commit(mt.setFriends, { items });
+        console.log('getFriends already', user_id, { items });
+        if (fof) {
+          commit(mt.setFriendsFoF, { items });
+        } else {
+          commit(mt.setFriendsFoF, { items });
+          commit(mt.setFriends, { items });
+        }
         return items;
       }));
   },
+  // [at.getExecuteFriendsInGroup]({ dispatch, commit }, { items }) {
+  //   return dispatch(at.incrCheckAndWait).then(() => fetchExecuteGetFriendsInGroup({ items })
+  //     .then((friends) => {
+  //       friends.forEach((item) => {
+  //         const { users } = item[1];
+  //         const group_id = item[0];
+  //         if (users) {
+  //           if (users.length === 1) {
+  //             const user = users[0];
+  //             commit(mt.setSingle, { group_id, user });
+  //           } else {
+  //             commit(mt.setGroupCommonFriends, { group_id, items: users });
+  //           }
+  //         }
+  //       });
+  //     }));
+  // },
+  // [at.getExecuteGroupInfo]({ dispatch, commit }, { items }) {
+  //   return dispatch(at.incrCheckAndWait).then(() => fetchExecuteGetGroupInfo({ items })
+  //     .then((data) => {
+  //       const res = data.map(item => item[0]);
+  //       commit(mt.setGroupById, { items: res });
+  //       return res;
+  //     }));
+  // },
+  // [at.getGroupCommonFriendsFromFriendGroups]({ dispatch }, payload) {
+  //   return dispatch(at.getGroupIdList, payload.user_id)
+  //     .then((groups) => {
+  //       // const groupChunks = _.chunk(groups, 25).slice(1, 3);
+  //       const groupChunks = _.chunk(groups, 25);
+  //       // iterateWithDelay(groupChunks, items => dispatch(at.getExecuteGroupInfo, { items }));
+  //         // .then(() => dispatch(at.getExecuteFriendsInGroup, { items })));
+  //     });
+  // },
   [at.getFirstGroup]({ commit, dispatch }, { items }) {
     // const friendCounter = state.friendCounter;
     // commit(mt.incrFriendCounter);
-    // const funcs = items.slice(1, 20).map((el, i) => () => new Promise(resolve =>
-    const funcs = items.map((el, i) => () => new Promise(resolve =>
+    const groupChunks = _.chunk(items, 25);
+    // fetchExecuteGetGroups({ items: groupChunks[0] })
+    //   .then(data => console.log(data));
+    // const funcs = groupChunks.map((el, i) => () => new Promise(resolve =>
+    const funcs = groupChunks.slice(1, 6).map((el, i) => () => new Promise(resolve =>
+      // const funcs = items.map((el, i) => () => new Promise(resolve =>
       setTimeout(resolve, (i === 0 ? i : i + 1) * 1))
       .then(() => {
         commit(mt.incrFriendCounter);
-        return dispatch(at.getGroupUsersList, { user_id: el, extended: 1 });
+        // return dispatch(at.getGroupUsersList, { user_id: el, extended: 0 });
+        return dispatch(at.getGroupUsersList, { items: el, extended: 0 });
       }));
     return funcs.reduce((p, f) => p.then(f), Promise.resolve());
     // return dispatch(at.getGroupCommonFriendsFromFriendGroups,
@@ -344,21 +457,21 @@ export const getters = {
         const groups = res[user_id] ? res[user_id].groups : [];
         res[user_id] = {
           user: state.friendList.find(el => el.uid === user_id),
-          groups: _.uniqBy([{ info: state.groups[gid] }].concat(groups), 'info.gid')
+          groups: _.uniqBy([{ info: state.groups[gid] }].concat(groups), 'info.gid'),
         };
       }
     });
     return res;
   },
-  getCommonGroups: (state) => {
-    const res = {};
-    _.forEach(state.groupUsersIdList, (val, key) => {
-      const data = _.map(val, user_id => state.friendList.find(el => el.uid === user_id));
-      res[key] = { data, info: state.groups[key] };
-      return res[key];
-    });
-    return res;
-  },
+  getCommonGroups: (state) =>
+    // const res = {};
+    // _.forEach(state.groupUsersIdList, (val, key) => {
+    //   // const data = _.map(val, user_id => state.friendList.find(el => el.uid === user_id));
+    //   // res[key] = { data, info: state.groups[key] };
+    //   res[key] = { info: state.groups[key] };
+    //   return res[key];
+    // });
+     _.toArray(state.groups),
   getStoredUserId: state => user_id => state.aliases[user_id],
   getCurrentUserGroups: state => state.groupIdList[state.currentUser.user_id],
   getUserGroups: state => user_id => state.groupIdList[user_id],

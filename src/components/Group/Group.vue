@@ -1,7 +1,7 @@
 <template>
   <div class="root">
-    <group-logo :item="item.info"></group-logo>
-    <members :item="item.data"></members>
+    <group-logo :item="item"></group-logo>
+    <!--<members :item="item.data"></members>-->
   </div>
 </template>
 
